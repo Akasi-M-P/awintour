@@ -1,7 +1,6 @@
 // CORE MODULES
 const fs = require("fs");
 const express = require("express");
-const { create } = require("domain");
 const morgan = require("morgan");
 
 const app = express();
@@ -11,8 +10,12 @@ const tourRoute = require("./routes/tourRoutes");
 const userRoute = require("./routes/userRoutes");
 
 // REGULAR MODULES
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 
 // TOUR ROUTER USED
 app.use("/api/v1/tours", tourRoute);

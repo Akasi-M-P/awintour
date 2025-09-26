@@ -11,7 +11,7 @@ router.param("id", tourController.checkID);
 router
   .route("/")
   .get(tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(tourController.checkBodyMiddleware, tourController.createTour);
 
 router
   .route("/:id")
