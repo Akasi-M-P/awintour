@@ -1,5 +1,4 @@
 // CORE MODULES
-const fs = require("fs");
 const express = require("express");
 const morgan = require("morgan");
 
@@ -15,6 +14,8 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json());
+
+// STATIC FILES URL DIRECTORY
 app.use(express.static(`${__dirname}/public`));
 
 // TOUR ROUTER USED

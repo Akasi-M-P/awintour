@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-// TOUR ROUTES
+// READ TOURS FROM FILE
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
