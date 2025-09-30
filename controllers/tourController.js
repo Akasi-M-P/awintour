@@ -1,21 +1,4 @@
-const fs = require("fs");
-
-// READ TOURS FROM FILE
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-
-exports.checkID = (req, res, next, val) => {
-  console.log(`${val}`);
-  // Handle ERROR when ID is INVALID
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: "failed",
-      message: "Invalid ID",
-    });
-  }
-  next();
-};
+const Tour = require("./../models/tourModel");
 
 exports.checkBodyMiddleware = (req, res, next) => {
   if (!req.body.name || !req.body.price) {
