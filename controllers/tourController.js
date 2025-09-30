@@ -1,15 +1,5 @@
 const Tour = require("./../models/tourModel");
 
-exports.checkBodyMiddleware = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res.status(400).json({
-      status: "failed",
-      message: "Missing name or price",
-    });
-  }
-  next();
-};
-
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: "success",
@@ -36,30 +26,23 @@ exports.getTour = (req, res) => {
   });
 };
 
-exports.createTour = (req, res) => {
-  // CREATE A NEW TOUR ID
-  const newId = tours[tours.length - 1].id + 1;
-  // ASSIGN NEW ID TO NEW TOUR
-  const newTour = Object.assign({ id: newId }, req.body);
+// CREATE A NEW TOUR
+exports.createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
 
-  // ADD NEW TOUR TO TOURS ARRAY
-  tours.push(newTour);
-
-  console.log(newTour);
-
-  // WRITE NEW TOUR TO TOURS ARRAY
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          tour: newTour,
-        },
-      });
-    }
-  );
+    res.status(201).json({
+      status: "success",
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
 };
 
 exports.updateTour = (req, res) => {
