@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const app = require("./app");
-
 dotenv.config({ path: "./config.env" });
+const app = require("./app");
 
 // CONNECT HOSTED MONGODB TO APP USING MONGOOSE
 const DB = process.env.DATABASE.replace(
@@ -12,7 +11,7 @@ const DB = process.env.DATABASE.replace(
 
 mongoose
   .connect(DB)
-  .then((con) => console.log(con.connections))
+  // .then((con) => console.log(con.connections))
   .then(() => console.log("DB Connected Successfully"))
   .catch((err) => console.log(err));
 
