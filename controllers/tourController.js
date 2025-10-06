@@ -27,6 +27,14 @@ exports.getAllTours = async (req, res) => {
       query = query.sort("-createdAt");
     }
 
+    // LIMITING FIELDS SO THAT ONLY SELECT FIELDS WILL BE SENT AS RESPONSE AND DESELECTED FIELDS WITH (-) WILL BE EXCLUDE FROM RESPONSE AS WELL
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      query = query.select("-__v");
+    }
+
     const tours = await query;
 
     res.status(200).json({
