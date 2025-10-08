@@ -1,5 +1,15 @@
 const Tour = require("./../models/tourModel");
 
+// THIS ROUTES GETS THE TOP 5 CHEAPEST TOURS
+exports.aliasTopTours = (req, res, next) => {
+  console.log("Alias middleware triggered");
+  req.query.limit = "5";
+  req.query.sort = "-ratingsAverage,price";
+  req.query.fields = "name,price,ratingsAverage,summary,difficulty";
+  console.log("Alias middleware triggered");
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query);
@@ -35,16 +45,33 @@ exports.getAllTours = async (req, res) => {
       query = query.select("-__v");
     }
 
-    // IMPLEMENT PAGINATION IN THE API TO ENSURE THAT A CERTAIN NUMBER OF DOCS ARE DISPLAYED ON EACH PAGE
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
+    //  PAGINATION LOGIC
+    // Pagination allows clients to request a specific "page" of results,
+    // instead of loading all documents at once (which can be slow and memory-heavy).
+
+    // STEP 1: Extract pagination parameters from the query string
+    // Example request: /api/v1/tours?page=2&limit=10
+    // 'page' = which page to view, 'limit' = number of documents per page
+    // The `* 1` converts them from strings to numbers
+    const page = req.query.page * 1 || 1; // Default to page 1 if not specified
+    const limit = req.query.limit * 1 || 100; // Default to 100 documents per page
+
+    // STEP 2: Calculate how many documents to skip
+    // If page=1 → skip=0 (start from the first document)
+    // If page=2 and limit=10 → skip=(2-1)*10=10 (skip the first 10 documents)
     const skip = (page - 1) * limit;
 
+    // STEP 3: Apply pagination to the query
+    // `skip()` tells MongoDB how many docs to ignore before starting to return results
+    // `limit()` tells MongoDB how many docs to actually return
     query = query.skip(skip).limit(limit);
 
+    // STEP 4: Optional check — handle non-existent pages
+    // If the client requests a page beyond the total number of documents,
+    // throw an error to indicate that the page doesn’t exist.
     if (req.query.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip > numTours) throw new Error("This page does not exist");
+      const numTours = await Tour.countDocuments(); // Count total documents
+      if (skip >= numTours) throw new Error("This page does not exist");
     }
 
     const tours = await query;
