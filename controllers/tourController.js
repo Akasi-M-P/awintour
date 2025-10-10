@@ -4,9 +4,9 @@ const APIFeatures = require("../utils/apiFeatures");
 // THIS ROUTES GETS THE TOP 5 CHEAPEST TOURS
 exports.aliasTopTours = (req, res, next) => {
   console.log("Alias middleware triggered");
-  req.query.limit = "5";
-  req.query.sort = "-ratingsAverage,price";
   req.query.fields = "name,price,ratingsAverage,summary,difficulty";
+  req.query.sort = "-ratingsAverage,price";
+  req.query.limit = "5";
   console.log("Alias middleware triggered");
   next();
 };
@@ -100,6 +100,46 @@ exports.deleteTour = async (req, res) => {
     res.status(204).json({
       status: "success",
       data: null,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};
+
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: {
+          ratingsAverage: { $gte: 4.5 },
+        },
+      },
+      {
+        $group: {
+          _id: { $toUpper: "$difficulty" },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: "$ratingsQuantity" },
+          avgRating: { $avg: "$ratingsAverage" },
+          avgPrice: { $avg: "$price" },
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+      {
+        $sort: {
+          avgPrice: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats,
+      },
     });
   } catch (error) {
     res.status(400).json({
