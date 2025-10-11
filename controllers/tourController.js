@@ -11,6 +11,7 @@ exports.aliasTopTours = (req, res, next) => {
   next();
 };
 
+// GET ALL TOURS
 exports.getAllTours = async (req, res) => {
   try {
     const features = new APIFeatures(Tour.find(), req.query)
@@ -35,6 +36,7 @@ exports.getAllTours = async (req, res) => {
   }
 };
 
+// GET A TOUR
 exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
@@ -72,6 +74,7 @@ exports.createTour = async (req, res) => {
   }
 };
 
+// UPDATE TOUR
 exports.updateTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -93,6 +96,7 @@ exports.updateTour = async (req, res) => {
   }
 };
 
+// DELETE TOUR
 exports.deleteTour = async (req, res) => {
   try {
     await Tour.findByIdAndDelete(req.params.id);
@@ -109,6 +113,7 @@ exports.deleteTour = async (req, res) => {
   }
 };
 
+// GET TOUR STATISTICS
 exports.getTourStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
@@ -139,6 +144,59 @@ exports.getTourStats = async (req, res) => {
       status: "success",
       data: {
         stats,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error.message,
+    });
+  }
+};
+
+// GET MONTHLY STATISTICS
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+    const plan = await Tour.aggregate([
+      {
+        $unwind: "$startDates",
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$startDates" },
+          numTourStarts: { $sum: 1 },
+          tours: { $push: "$name" },
+        },
+      },
+      {
+        $addFields: { month: "$_id" },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { numTourStarts: -1 },
+      },
+      {
+        $limit: 12,
+      },
+    ]);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        plan,
       },
     });
   } catch (error) {
