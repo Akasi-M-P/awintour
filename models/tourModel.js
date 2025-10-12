@@ -59,6 +59,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -87,6 +91,21 @@ tourSchema.pre("save", function (next) {
 //   console.log("DOCUMENT SAVED FROM THE POST MIDDLEWARE");
 //   // next();
 // });
+
+// MONGOOSE QUERY MIDDLEWARE: ALLOWS DATA TO BE MANIPULATED BEFORE AND AFTER A QUERY IS MADE. E.G(FIND(),FINDONE(),FINDONEANDUPDATE()...ETC)"
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  // CALCULATE HOW LONG IT TAKES TO RECEIVE A RESPONSE FROM A QUERY
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  // CALCULATE HOW LONG IT TAKES TO RECEIVE A RESPONSE FROM A QUERY
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  console.log(docs);
+  next();
+});
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;
