@@ -103,9 +103,15 @@ tourSchema.pre(/^find/, function (next) {
 tourSchema.post(/^find/, function (docs, next) {
   // CALCULATE HOW LONG IT TAKES TO RECEIVE A RESPONSE FROM A QUERY
   console.log(`Query took ${Date.now() - this.start} milliseconds`);
-  console.log(docs);
   next();
 });
+
+// MONGOOSE AGGREGATE MIDDLEWARE: ALLOWS DATA TO BE MANIPULATED BEFORE AND AFTER AN AGGREGATE IS IMPLEMENTED.
+tourSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ secretTour: { $ne: true } });
+  next();
+});
+
 const Tour = mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;
