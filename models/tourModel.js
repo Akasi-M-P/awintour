@@ -9,6 +9,8 @@ const tourSchema = new mongoose.Schema(
       required: [true, "A tour must have a name"],
       unique: true,
       trim: true,
+      maxlength: [40, "Name must have equal or less than 40 characters"],
+      minlength: [10, "Name must have equal or more than 10 characters"],
     },
     slug: String,
     duration: {
@@ -22,11 +24,17 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, "A tour must have a difficulty"],
+      enum: {
+        values: ["easy", "medium", "difficult"],
+        message: "Difficulty is either: easy, medium, difficulty",
+      },
     },
 
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, "Rating must be equal or above 1"],
+      max: [5, "Rating must be equal or less 5"],
     },
     ratingQuantity: {
       type: Number,
@@ -38,6 +46,13 @@ const tourSchema = new mongoose.Schema(
     },
     priceDiscount: {
       type: Number,
+      validate: {
+        // THIS VALIDATOR ONLY WORKS ON THE CURRENT DOC BEING CREATED
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: "Discount price ({VALUE}) shouuld be below regular price",
+      },
     },
     summary: {
       type: String,
@@ -108,7 +123,7 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // MONGOOSE AGGREGATE MIDDLEWARE: ALLOWS DATA TO BE MANIPULATED BEFORE AND AFTER AN AGGREGATE IS IMPLEMENTED.
 tourSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ secretTour: { $ne: true } });
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
 
