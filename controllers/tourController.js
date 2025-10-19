@@ -8,6 +8,7 @@ exports.aliasTopTours = (req, res, next) => {
   req.query.sort = "-ratingsAverage,price";
   req.query.limit = "5";
   console.log("Alias middleware triggered");
+  console.log("Modified query:", req.query);
   next();
 };
 
