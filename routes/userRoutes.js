@@ -3,10 +3,14 @@ const express = require("express");
 
 // CUSTOM MODULES
 const userController = require("../controllers/userController");
+const authController = require("../controllers/authController");
 
 // USER ROUTES
 // USER ROUTE CREATED TO USE EXPRESS ROUTER
 const router = express.Router();
+
+// SIGNING UP A NEW USER
+router.post("/signup", authController.signup);
 
 router
   .route("/")
