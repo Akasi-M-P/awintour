@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 // THIS CREATES A USER MODEL USING MONGOOSE
 const userSchema = new mongoose.Schema({
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide your email"],
     unique: true,
     lowercase: true,
-    validator: [validator.isEmail, "Please provide a valid email"],
+    validate: [validator.isEmail, "Please provide a valid email"],
   },
   photo: String,
   password: {
@@ -23,7 +24,26 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, "Please confirm your password"],
+    validate: {
+      validator: function (el) {
+        return el === this.password;
+      },
+      message: "Password are not the same",
+    },
   },
+});
+
+//THIS FUNCTION ONLY WORKS IF THE PASSWORD WAS ACTUALLY MODIFIED
+userSchema.pre("save", async function (next) {
+  //RETURN IF PASSWORD WAS NOT MODIFIED AND MOVE TO THE NEXT FUNCTION
+  if (!this.isModified("password")) return next();
+
+  //HASH THE PASSWORD WITH COST OF 12
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // DELETE PASSWORDCONFIRM FIELD
+  this.passwordConfirm = undefined;
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
