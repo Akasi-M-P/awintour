@@ -12,6 +12,9 @@ const router = express.Router();
 // SIGNING UP A NEW USER
 router.post("/signup", authController.signup);
 
+// LOGGING IN USER
+router.post("/login", authController.login);
+
 router
   .route("/")
   .get(userController.getAllUsers)
