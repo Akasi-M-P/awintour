@@ -13,6 +13,20 @@ const signToken = (id) => {
   });
 };
 
+// USER DETAILS ARE VALID, SEND TOKEN TO CLIENT FUNCTION
+const createSendToken = (user, statusCode, res) => {
+  //GENERATES UNIQUE TOKEN FOR USER
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 //SIGNS UP NEW USER WITH VALID DETAILS
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -23,15 +37,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   //GENERATES UNIQUE TOKEN FOR USER
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: "success",
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 //LOGS IN USER WITH VALID DETAILS
@@ -51,12 +57,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // IF USER DETAILS ARE VALID, SEND TOKEN TO CLIENT
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 // THIS MIDDLEWARE PROTECTS GET ALL TOURS ROUTE
@@ -184,10 +185,24 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // IF USER DETAILS ARE VALID, SEND TOKEN TO CLIENT
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+// THIS ALLOWS LOGGED IN USERS TO CHANGE THEIR PASSWORD IF THEY WANT
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // GET USER FROM THE DATABASE COLLECTION
+  const user = await User.findById(req.user.id).select("+password"); //USER.findByIdAndUpdate WILL NOT WORK AS INTENDED BECAUSE MONGO DOES NOT KEEP CURRENT DATA IN MEMORY
+
+  // CHECK IF POSTED CURRENT PASSWORD IS CORRECT
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Password entered is incorrect", 401));
+  }
+
+  // IF CORRECT, UPDATE THE PASSWORD
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // LOG USER IN AND SEND JWT
+  createSendToken(user, 200, res);
 });

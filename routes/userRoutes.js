@@ -19,6 +19,13 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
+// WHEN A USER IS LOGGED IN AND WANTS TO UPDATE THEIR PASSWORD
+router.patch(
+  "/updateMyPassword",
+  authController.protect,
+  authController.updatePassword
+);
+
 router
   .route("/")
   .get(userController.getAllUsers)
