@@ -26,6 +26,9 @@ router.patch(
   authController.updatePassword
 );
 
+//WHEN A USER IS LOGGED IN WANTS TO UPDATE THEIR DATA AND NOT PASSWORD
+router.patch("/updateMe", authController.protect, userController.updateMe);
+
 router
   .route("/")
   .get(userController.getAllUsers)
