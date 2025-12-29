@@ -36,7 +36,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       )
     );
   }
-
   // FILTERED OUT UNWANTED FIELD NAMES TAHT ARE NOT ALLOWED TO BE UPDATED
   const filteredBody = filterObj(req.body, "name", "email");
 
@@ -51,6 +50,18 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser,
     },
+  });
+});
+
+// THIS ROUTE ALLOWS A LOGGED IN USER TO DELETE THEIR ACCOUNT(DEACTIVATE ACCOUNT === FALSE)
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, {
+    active: false,
+  });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
 });
 

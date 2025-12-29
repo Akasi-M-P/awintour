@@ -42,6 +42,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 //THIS FUNCTION ONLY WORKS IF THE PASSWORD WAS ACTUALLY MODIFIED
@@ -62,6 +67,12 @@ userSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// THIS QUERY MIDDLEWARE POINTS TO THE CURRENT QUERY AND RETURN ONLY USERS WITH ACTIVE SET TO TRUE
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 

@@ -29,6 +29,9 @@ router.patch(
 //WHEN A USER IS LOGGED IN WANTS TO UPDATE THEIR DATA AND NOT PASSWORD
 router.patch("/updateMe", authController.protect, userController.updateMe);
 
+// WHEN A USER WANTS TO DELETE(DEACTIVATE) THEIR ACCOUNT
+router.delete("/deleteMe", authController.protect, userController.deleteMe);
+
 router
   .route("/")
   .get(userController.getAllUsers)
