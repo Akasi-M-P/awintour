@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const AppError = require("../utils/appError");
 
 // THIS CREATES A USER MODEL USING MONGOOSE
 const userSchema = new mongoose.Schema({
@@ -53,6 +54,14 @@ userSchema.pre("save", async function (next) {
 
   // DELETE PASSWORDCONFIRM FIELD
   this.passwordConfirm = undefined;
+  next();
+});
+
+// THIS MIDDLEWARE UPDATES THE PASSWORDCHANGEDAT AFTER THE PASSWORD HAS BEEN RESET
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
