@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -16,6 +17,11 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, "Please provide a valid email"],
   },
   photo: String,
+  role: {
+    type: String,
+    enum: ["user", "guide", "lead-guide", "admin"],
+    default: "user",
+  },
   password: {
     type: String,
     required: [true, "Please provide a password"],
@@ -32,7 +38,9 @@ const userSchema = new mongoose.Schema({
       message: "Password are not the same",
     },
   },
-  passwordChangedAt: { type: Date, default: Date.now },
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
 //THIS FUNCTION ONLY WORKS IF THE PASSWORD WAS ACTUALLY MODIFIED
@@ -69,6 +77,22 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
   // FALSE MEANS PASSWORD WAS NOT CHANGED
   return false;
+};
+
+// USE IN-BUILD CRYPTO METHOD TO CREATE A TOKEN FOR PASSWORD RESET
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);

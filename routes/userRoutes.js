@@ -15,6 +15,10 @@ router.post("/signup", authController.signup);
 // LOGGING IN USER
 router.post("/login", authController.login);
 
+// WHEN A USER FORGETS PASSWORD AND WANTS TO RESET IT
+router.post("/forgotPassword", authController.forgotPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
+
 router
   .route("/")
   .get(userController.getAllUsers)
