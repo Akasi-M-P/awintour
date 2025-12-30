@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+// const User = require("./userModel");
 
 // THIS CREATES A TOUR MODEL USING MONGOOSE
 const tourSchema = new mongoose.Schema(
@@ -29,14 +30,13 @@ const tourSchema = new mongoose.Schema(
         message: "Difficulty is either: easy, medium, difficulty",
       },
     },
-
     ratingsAverage: {
       type: Number,
       default: 4.5,
       min: [1, "Rating must be equal or above 1"],
       max: [5, "Rating must be equal or less 5"],
     },
-    ratingQuantity: {
+    ratingsQuantity: {
       type: Number,
       default: 0,
     },
@@ -78,6 +78,36 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // GEOJSON
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -96,6 +126,13 @@ tourSchema.pre("save", function (next) {
   next();
 });
 
+// THIS MIDDLEWARE GETS GUIDES OF THE TOUR AND EMBED IT TO THE TOUR
+// tourSchema.pre("save", async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
 // tourSchema.pre("save", function (next) {
 //   console.log("DOCUMENT BEING CREATED");
 //   next();
@@ -112,6 +149,15 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   // CALCULATE HOW LONG IT TAKES TO RECEIVE A RESPONSE FROM A QUERY
   this.start = Date.now();
+  next();
+});
+
+// THIS QUERY MIDDLEWARE POPULATES QUERY WITH GUIDES AND UNSELECTS SOME PROPERTIES
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
   next();
 });
 
