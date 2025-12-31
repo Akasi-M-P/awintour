@@ -120,6 +120,13 @@ tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 });
 
+// VIRTUAL POPULATE OF REVIEWS ON EACH TOUR QUERY
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
+
 // MONGOOSE DOC MIDDLEWARE: THE PRE MIDDLEWARE RUN BEFORE A DOC IS "SAVE()" OR "CREATE()" ONLY"
 tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });

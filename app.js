@@ -12,6 +12,7 @@ const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
 const tourRoute = require("./routes/tourRoutes");
 const userRoute = require("./routes/userRoutes");
+const reviewRoute = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -77,6 +78,9 @@ app.use("/api/v1/tours", tourRoute);
 
 // USER ROUTER USED
 app.use("/api/v1/users", userRoute);
+
+// REVIEW ROUTER USED
+app.use("/api/v1/reviews", reviewRoute);
 
 // UNHANDLED ROUTES
 app.all("/{*any}", (req, res, next) => {
