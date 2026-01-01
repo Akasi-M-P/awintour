@@ -19,26 +19,23 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
+// THIS PROTECT MIDDLEWARE PROTECTS ALL USER ROUTES THAT COME AFTER IT SO DO NOT REQUIRE THE PROTECT IN EACH ROUTE
+router.use(authController.protect);
+
 // GETTING A USER USING THE LOGGED IN USER ID
-router.get(
-  "/me",
-  authController.protect,
-  userController.getMe,
-  userController.getUser
-);
+router.get("/me", userController.getMe, userController.getUser);
 
 // WHEN A USER IS LOGGED IN AND WANTS TO UPDATE THEIR PASSWORD
-router.patch(
-  "/updateMyPassword",
-  authController.protect,
-  authController.updatePassword
-);
+router.patch("/updateMyPassword", authController.updatePassword);
 
 //WHEN A USER IS LOGGED IN WANTS TO UPDATE THEIR DATA AND NOT PASSWORD
-router.patch("/updateMe", authController.protect, userController.updateMe);
+router.patch("/updateMe", userController.updateMe);
 
 // WHEN A USER WANTS TO DELETE(DEACTIVATE) THEIR ACCOUNT
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+router.delete("/deleteMe", userController.deleteMe);
+
+// THIS MIDDLEWARE PRROTECTS ALL ROUTES THAT COME AFTER IT TO ALLOW ONLY ADMINS HAVE ACCESS
+router.use(authController.restrictTo("admin"));
 
 router
   .route("/")
