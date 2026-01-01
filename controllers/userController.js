@@ -13,18 +13,6 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 // USERS ROUTE HANDLERS
-// GET ALL USERS
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: "success",
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
 
 // THIS ROUTE ALLOWS A LOGGED USER TO UPDATE THEIR DATA AND NOT PASSWORD
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -66,12 +54,11 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "Server not yet defined",
-  });
-};
+// GET ALL USERS
+exports.getAllUsers = factory.getAll(User);
+
+// GET SINGLE USER BASE ON USER ID
+exports.getUser = factory.getOne(User);
 
 exports.createUser = factory.createOne(User);
 

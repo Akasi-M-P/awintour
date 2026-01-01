@@ -1,7 +1,5 @@
 const Tour = require("./../models/tourModel");
-const APIFeatures = require("../utils/apiFeatures");
 const catchAsync = require("./../utils/catchAsync");
-const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
 
 // THIS ROUTES GETS THE TOP 5 CHEAPEST TOURS
@@ -16,40 +14,28 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 // GET ALL TOURS
-exports.getAllTours = catchAsync(async (req, res) => {
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await features.query;
+exports.getAllTours = factory.getAll(Tour);
 
-  res.status(200).json({
-    status: "success",
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
+// // GET A TOUR
+exports.getTour = factory.getOne(Tour, { path: "reviews" });
 
-// GET A TOUR
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate("reviews");
+// // GET A TOUR
+// exports.getTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findById(req.params.id).populate("reviews");
 
-  // WHEN THERE IS NO TOUR FOUND WITH AN ID
-  if (!tour) {
-    return next(new AppError("No tour found with that ID", 404));
-  }
+//   // WHEN THERE IS NO TOUR FOUND WITH AN ID
+//   if (!tour) {
+//     return next(new AppError("No tour found with that ID", 404));
+//   }
 
-  // SEND TOUR TO CLIENT
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour,
-    },
-  });
-});
+//   // SEND TOUR TO CLIENT
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       tour,
+//     },
+//   });
+// });
 
 // CREATE A NEW TOUR
 exports.createTour = factory.createOne(Tour);
