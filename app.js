@@ -21,6 +21,9 @@ const app = express();
 // SET SECURITY HTTP HEADERS
 app.use(helmet());
 
+// 👇 THIS LINE FIXES YOUR ISSUE
+app.set("query parser", "extended");
+
 // DEVELOPMENT LOGGING
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
