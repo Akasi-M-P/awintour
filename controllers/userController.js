@@ -14,6 +14,11 @@ const filterObj = (obj, ...allowedFields) => {
 
 // USERS ROUTE HANDLERS
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 // THIS ROUTE ALLOWS A LOGGED USER TO UPDATE THEIR DATA AND NOT PASSWORD
 exports.updateMe = catchAsync(async (req, res, next) => {
   // CREATE ERROR IF USER TRIES TO UPDATE PASSWORD DATA
