@@ -180,10 +180,10 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 
 // MONGOOSE AGGREGATE MIDDLEWARE: ALLOWS DATA TO BE MANIPULATED BEFORE AND AFTER AN AGGREGATE IS IMPLEMENTED.
-tourSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-});
+// tourSchema.pre("aggregate", function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
 
 const Tour = mongoose.model("Tour", tourSchema);
 
