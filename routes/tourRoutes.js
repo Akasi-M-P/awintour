@@ -28,6 +28,11 @@ router
     tourController.getMonthlyPlan
   );
 
+// GETS TOURS WITHIN A CERTAIN DISTANCE
+router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
+
 router
   .route("/")
   .get(tourController.getAllTours)
