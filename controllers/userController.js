@@ -1,6 +1,7 @@
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
+const factory = require("./handlerFactory");
 
 // THIS FUNCTION FILTERS FIELD NAMES IN THE UPDATEME ROUTE
 const filterObj = (obj, ...allowedFields) => {
@@ -72,23 +73,9 @@ exports.getUser = (req, res) => {
   });
 };
 
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "Server not yet defined",
-  });
-};
+exports.createUser = factory.createOne(User);
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "Server not yet defined",
-  });
-};
+// DO NOT USE TO UPDATE PASSWORDS
+exports.updateUser = factory.updateOne(User);
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "Server not yet defined",
-  });
-};
+exports.deleteUser = factory.deleteOne(User);

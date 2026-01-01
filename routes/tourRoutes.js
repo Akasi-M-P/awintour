@@ -4,8 +4,12 @@ const express = require("express");
 // CUSTOM MODULES
 const tourController = require("../controllers/tourController");
 const authController = require("../controllers/authController");
+const reviewRouter = require("./../routes/reviewRoutes");
 
 const router = express.Router();
+
+// THIS IMPLIES THAT ANYTIME ITS SLASH TOUR ID SLASH REVIEWS, THEN THE TOUR ROUTE CAN USE THE REVIEWROUTER TO ACCESS THE REVIEWS OF THAT TOUR
+router.use("/:tourId/reviews", reviewRouter);
 
 // ALIAS ROUTE
 router
