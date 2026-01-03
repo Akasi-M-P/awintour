@@ -1,5 +1,6 @@
 // CORE MODULES
 const express = require("express");
+const path = require("path");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
@@ -10,13 +11,20 @@ const hpp = require("hpp");
 // CUSTOM MODULES
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
-const tourRoute = require("./routes/tourRoutes");
-const userRoute = require("./routes/userRoutes");
-const reviewRoute = require("./routes/reviewRoutes");
+const tourRouter = require("./routes/tourRoutes");
+const userRouter = require("./routes/userRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
+const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
 
+// PART 2 | CLIENT SIDE | SET APP TO USE PUG AS THE TEMPLATE ENGINE
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+
 // GLOBAL MODULES
+// STATIC FILES URL DIRECTORY
+app.use(express.static(path.join(__dirname, "public")));
 
 // SET SECURITY HTTP HEADERS
 app.use(helmet());
@@ -73,17 +81,19 @@ app.use(
   })
 );
 
-// STATIC FILES URL DIRECTORY
-app.use(express.static(`${__dirname}/public`));
+// ROUTES
+
+// VIEWS ROUTER USED
+app.use("/", viewRouter);
 
 // TOUR ROUTER USED
-app.use("/api/v1/tours", tourRoute);
+app.use("/api/v1/tours", tourRouter);
 
 // USER ROUTER USED
-app.use("/api/v1/users", userRoute);
+app.use("/api/v1/users", userRouter);
 
 // REVIEW ROUTER USED
-app.use("/api/v1/reviews", reviewRoute);
+app.use("/api/v1/reviews", reviewRouter);
 
 // UNHANDLED ROUTES
 app.all("/{*any}", (req, res, next) => {
