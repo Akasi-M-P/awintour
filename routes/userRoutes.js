@@ -1,9 +1,13 @@
 // CORE MODULES
 const express = require("express");
+const multer = require("multer");
 
 // CUSTOM MODULES
 const userController = require("../controllers/userController");
 const authController = require("../controllers/authController");
+
+// UPLOADING FILE PACKAGE
+const upload = multer({ dest: "public/img/users" });
 
 // USER ROUTES
 // USER ROUTE CREATED TO USE EXPRESS ROUTER
@@ -32,7 +36,7 @@ router.get("/me", userController.getMe, userController.getUser);
 router.patch("/updateMyPassword", authController.updatePassword);
 
 //WHEN A USER IS LOGGED IN WANTS TO UPDATE THEIR DATA AND NOT PASSWORD
-router.patch("/updateMe", userController.updateMe);
+router.patch("/updateMe", upload.single("photo"), userController.updateMe);
 
 // WHEN A USER WANTS TO DELETE(DEACTIVATE) THEIR ACCOUNT
 router.delete("/deleteMe", userController.deleteMe);

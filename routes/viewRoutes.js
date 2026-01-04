@@ -18,4 +18,11 @@ router.get("/login", authController.isLoggedIn, viewController.getLoginForm);
 // ROUTE FOR OPENING USER ACCOUNT/PROFILE
 router.get("/me", authController.protect, viewController.getAccount);
 
+// UPDATING USER DATA
+router.post(
+  "/submit-user-data",
+  authController.protect,
+  viewController.updateUserData
+);
+
 module.exports = router;
