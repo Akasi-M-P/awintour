@@ -1,8 +1,8 @@
-// SELECT THE MAP CONTAINER ELEMENT FROM THE DOM
-const mapEl = document.getElementById("map");
+// EXPORT FUNCTION TO DISPLAY MAP
+export const displayMap = (mapEl) => {
+  // ONLY EXECUTE MAP LOGIC IF THE MAP ELEMENT EXISTS
+  if (!mapEl) return;
 
-// ONLY EXECUTE MAP LOGIC IF THE MAP ELEMENT EXISTS ON THE PAGE
-if (mapEl) {
   // PARSE LOCATIONS DATA PASSED FROM THE SERVER VIA DATA ATTRIBUTE
   const locations = JSON.parse(mapEl.dataset.locations);
 
@@ -15,41 +15,36 @@ if (mapEl) {
 
   // INITIALIZE MAPBOX MAP
   const map = new mapboxgl.Map({
-    container: "map", // HTML ELEMENT ID WHERE MAP WILL RENDER
-    style: "mapbox://styles/mapbox/streets-v12", // MAP STYLE
-    scrollZoom: false, // DISABLE SCROLL ZOOM TO PREVENT PAGE INTERFERENCE
+    container: "map",
+    style: "mapbox://styles/mapbox/streets-v12",
+    scrollZoom: false,
   });
 
-  // CREATE BOUNDING BOX TO FIT ALL LOCATIONS ON THE MAP
+  // CREATE BOUNDS TO FIT ALL LOCATIONS
   const bounds = new mapboxgl.LngLatBounds();
 
-  // LOOP THROUGH EACH LOCATION AND ADD MARKERS AND POPUPS
+  // LOOP THROUGH LOCATIONS
   locations.forEach((loc) => {
-    // CREATE CUSTOM MARKER ELEMENT
+    // CREATE MARKER ELEMENT
     const el = document.createElement("div");
     el.className = "marker";
 
-    // ADD MARKER TO MAP
-    new mapboxgl.Marker({
-      element: el,
-      anchor: "bottom",
-    })
+    // ADD MARKER
+    new mapboxgl.Marker({ element: el, anchor: "bottom" })
       .setLngLat(loc.coordinates)
       .addTo(map);
 
-    // ADD POPUP FOR EACH LOCATION
-    new mapboxgl.Popup({
-      offset: 20,
-    })
+    // ADD POPUP
+    new mapboxgl.Popup({ offset: 20 })
       .setLngLat(loc.coordinates)
       .setHTML(`<p class="mapbox-popup">Day ${loc.day}: ${loc.description}</p>`)
       .addTo(map);
 
-    // EXTEND MAP BOUNDS TO INCLUDE CURRENT LOCATION
+    // EXTEND MAP BOUNDS
     bounds.extend(loc.coordinates);
   });
 
-  // ADJUST MAP VIEW TO FIT ALL MARKERS WITH PADDING
+  // FIT MAP TO ALL MARKERS
   map.fitBounds(bounds, {
     padding: {
       top: 200,
@@ -59,8 +54,8 @@ if (mapEl) {
     },
   });
 
-  // FORCE PAGE SCROLL TO TOP AFTER MAP RENDER TO PREVENT AUTO-SCROLL
+  // FORCE SCROLL TO TOP AFTER MAP LOAD
   requestAnimationFrame(() => {
     window.scrollTo(0, 0);
   });
-}
+};

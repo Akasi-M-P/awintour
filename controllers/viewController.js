@@ -17,11 +17,9 @@ exports.getTour = catchAsync(async (req, res, next) => {
     fields: "review rating user",
   });
 
-  tour.formattedDate = tour.startDates[0].toISOString().split("T")[0];
-
   // WHEN THERE IS NO DOCUMENT FOUND WITH AN ID
   if (!tour) {
-    return next(new AppError("No document found with that ID", 404));
+    return next(new AppError("No tour found with that name", 404));
   }
 
   res.status(200).render("tour", {
@@ -31,21 +29,13 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
-  // const { email, password } = req.body;
-
-  // // CHECK IF EMAIL AND PASSWORD EXIST
-  // if (!email || !password) {
-  //   return next(new AppError("Please provide email and password", 400));
-  // }
-
-  // // CHECK IF USER EXIST AND PASSWORD IS CORRECT
-  // const user = await User.findOne({ email }).select("+password");
-
-  // if (!user || !(await user.correctPassword(password, user.password))) {
-  //   return next(new AppError("Incorrect email or password", 401));
-  // }
-
   res.status(200).render("login", {
     title: "Log in into your acccount",
+  });
+};
+
+exports.getAccount = (req, res) => {
+  res.status(200).render("account", {
+    title: "Your Account",
   });
 };

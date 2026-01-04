@@ -6,15 +6,16 @@ const router = express.Router();
 
 // PUG ROUTES | SERVERSIDE RENDERING
 
-router.use(authController.isLoggedIn);
-
 // ROUTE FOR THE OVERVIEW PAGE
-router.get("/", viewController.getOverview);
+router.get("/", authController.isLoggedIn, viewController.getOverview);
 
 // ROUTE FOR A TOUR PAGE
-router.get("/tour/:slug", authController.protect, viewController.getTour);
+router.get("/tour/:slug", authController.isLoggedIn, viewController.getTour);
 
 // ROUTE FOR LOGGING USER INTO THE APP
-router.get("/login", viewController.getLoginForm);
+router.get("/login", authController.isLoggedIn, viewController.getLoginForm);
+
+// ROUTE FOR OPENING USER ACCOUNT/PROFILE
+router.get("/me", authController.protect, viewController.getAccount);
 
 module.exports = router;

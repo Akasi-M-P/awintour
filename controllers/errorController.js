@@ -24,34 +24,77 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError("Your session has expired. Please log in again.", 401);
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack,
+/**
+ * SEND DETAILED ERROR RESPONSE IN DEVELOPMENT MODE
+ * SHOWS FULL ERROR INFORMATION FOR DEBUGGING
+ */
+const sendErrorDev = (err, req, res) => {
+  // ===============================
+  // API REQUESTS
+  // ===============================
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
+  }
+
+  // ===============================
+  // RENDERED WEBSITE REQUESTS
+  // ===============================
+  return res.status(err.statusCode).render("error", {
+    title: "Something went wrong",
+    msg: err.message,
   });
 };
 
-const sendErrorProd = (err, res) => {
-  // This message is sent to the client when when the error is operational and trusted
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
-    });
+/**
+ * SEND LIMITED ERROR RESPONSE IN PRODUCTION MODE
+ * HIDES INTERNAL DETAILS FROM USERS
+ */
+const sendErrorProd = (err, req, res) => {
+  // ===============================
+  // API REQUESTS
+  // ===============================
+  if (req.originalUrl.startsWith("/api")) {
+    // OPERATIONAL, TRUSTED ERROR → SEND MESSAGE TO CLIENT
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    }
 
-    // These are programming and unknown errors and must not be leaked
-  } else {
-    // Log error
-    console.error("Error", err);
+    // PROGRAMMING OR UNKNOWN ERROR → LOG & SEND GENERIC MESSAGE
+    console.error("ERROR 💥", err);
 
-    // Send generic message
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Something went very wrong!",
     });
   }
+
+  // ===============================
+  // RENDERED WEBSITE REQUESTS
+  // ===============================
+
+  // OPERATIONAL, TRUSTED ERROR → SHOW USER-FRIENDLY MESSAGE
+  if (err.isOperational) {
+    return res.status(err.statusCode).render("error", {
+      title: "Something went wrong",
+      msg: err.message,
+    });
+  }
+
+  // PROGRAMMING OR UNKNOWN ERROR → LOG & SHOW GENERIC MESSAGE
+  console.error("ERROR 💥", err);
+
+  return res.status(err.statusCode).render("error", {
+    title: "Something went wrong",
+    msg: "Please try again later",
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -59,9 +102,10 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === "production") {
     let error = { ...err };
+    error.message = err.message;
 
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
@@ -70,6 +114,6 @@ module.exports = (err, req, res, next) => {
     if (error.name === "JsonWebTokenError") error = handleJWTError();
     if (error.name === "JsonWebTokenExpired") error = handleJWTExpiredError();
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };

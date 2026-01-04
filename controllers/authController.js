@@ -74,6 +74,16 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+// SERVERSIDE: LOGGING USER OUT
+exports.logout = (req, res) => {
+  res.cookie("jwt", "dummytokenbhhdxgchschdh", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({ status: "success" });
+};
+
 // THIS MIDDLEWARE PROTECTS GET ALL TOURS ROUTE
 exports.protect = catchAsync(async (req, res, next) => {
   // GETTING TOKEN AND CHECKING IF IT'S THERE
@@ -115,34 +125,40 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // THEN GRANT ACCESS TO PROTECTED ROUTE
   req.user = currentUser;
+  res.locals.user = currentUser;
   next();
 });
 
 // ONLY FOR RENDERED PAGES, NO ERRORS
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  if (req.cookies.jwt) {
-    // VERIFY TOKEN
-    const decoded = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+  try {
+    if (req.cookies.jwt) {
+      // VERIFY TOKEN
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // CHECK IF USER STILL EXIST
-    const currentUser = await User.findById(decoded.id);
+      // CHECK IF USER STILL EXIST
+      const currentUser = await User.findById(decoded.id);
 
-    if (!currentUser) {
+      if (!currentUser) {
+        return next();
+      }
+
+      // CHECK IF USER CHANGED PASSSWORD AFTER THE TOKEN WAS ISSUED
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
       return next();
     }
-
-    // CHECK IF USER CHANGED PASSSWORD AFTER THE TOKEN WAS ISSUED
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // THERE IS A LOGGED IN USER
-    res.locals.user = currentUser;
+  } catch (error) {
     return next();
   }
+
   next();
 });
 
