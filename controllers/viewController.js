@@ -25,7 +25,27 @@ exports.getTour = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).render("tour", {
-    title: tour.name,
+    title: `${tour.name} Tour`,
     tour,
   });
 });
+
+exports.getLoginForm = (req, res) => {
+  // const { email, password } = req.body;
+
+  // // CHECK IF EMAIL AND PASSWORD EXIST
+  // if (!email || !password) {
+  //   return next(new AppError("Please provide email and password", 400));
+  // }
+
+  // // CHECK IF USER EXIST AND PASSWORD IS CORRECT
+  // const user = await User.findOne({ email }).select("+password");
+
+  // if (!user || !(await user.correctPassword(password, user.password))) {
+  //   return next(new AppError("Incorrect email or password", 401));
+  // }
+
+  res.status(200).render("login", {
+    title: "Log in into your acccount",
+  });
+};

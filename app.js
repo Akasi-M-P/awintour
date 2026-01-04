@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xxs = require("xss-clean");
 const hpp = require("hpp");
+const cookieParser = require("cookie-parser");
 
 // CUSTOM MODULES
 const globalErrorHandler = require("./controllers/errorController");
@@ -27,7 +28,36 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // SET SECURITY HTTP HEADERS
-app.use(helmet());
+// app.use(helmet());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "https://api.mapbox.com",
+          "https://cdn.jsdelivr.net",
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://api.mapbox.com",
+          "https://fonts.googleapis.com",
+        ],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https://api.mapbox.com"],
+        connectSrc: [
+          "'self'",
+          "https://api.mapbox.com",
+          "https://events.mapbox.com",
+        ],
+        workerSrc: ["'self'", "blob:"],
+      },
+    },
+  })
+);
 
 // 👇 THIS LINE FIXES YOUR ISSUE
 app.set("query parser", "extended");
@@ -48,6 +78,7 @@ app.use("/api", limiter);
 
 // BODY PARSER, READS DATA FROM BODY INTO REQ.BODY
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
 // // DATA SANITIZATION AGAINST NOSQL QUERY INJECTION
 // app.use(mongoSanitize());
