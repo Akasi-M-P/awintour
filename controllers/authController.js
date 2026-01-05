@@ -76,7 +76,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
 // SERVERSIDE: LOGGING USER OUT
 exports.logout = (req, res) => {
-  res.cookie("jwt", "dummytokenbhhdxgchschdh", {
+  res.cookie("jwt", "", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });

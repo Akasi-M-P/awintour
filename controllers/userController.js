@@ -1,7 +1,31 @@
+const multer = require("multer");
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
+
+// UPLOADING FILES USING MULTER MIDDDLEWARE
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/img/users");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image. Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+exports.uploadUserPhoto = upload.single("photo");
 
 // THIS FUNCTION FILTERS FIELD NAMES IN THE UPDATEME ROUTE
 const filterObj = (obj, ...allowedFields) => {
@@ -32,6 +56,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
   // FILTERED OUT UNWANTED FIELD NAMES TAHT ARE NOT ALLOWED TO BE UPDATED
   const filteredBody = filterObj(req.body, "name", "email");
+
+  // THIS ADDS THE PHOTO PROPERTY TO THE OBJECT BODY TO BE FILTERED
+  if (req.file) filteredBody.photo = req.file.filename;
 
   //UPDATE USER DOCUMENT IN THE DATABASE
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
