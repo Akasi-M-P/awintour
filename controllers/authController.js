@@ -4,7 +4,7 @@ const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const jwt = require("jsonwebtoken");
 const AppError = require("./../utils/appError");
-const sendEmail = require("../utils/email");
+const Email = require("../utils/email");
 
 //GENERATES UNIQUE TOKEN FOR USER AND DETERMINES WHEN TOKEN EXPIRES
 const signToken = (id) => {
@@ -43,12 +43,12 @@ const createSendToken = (user, statusCode, res) => {
 
 //SIGNS UP NEW USER WITH VALID DETAILS
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-  });
+  const newUser = await User.create(req.body);
+
+  const url = `${req.protocol}://${req.get("host")}/me`;
+  console.log(url);
+
+  await new Email(newUser, url).sendWelcome();
 
   //GENERATES UNIQUE TOKEN FOR USER
   createSendToken(newUser, 201, res);
@@ -196,11 +196,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     \nIf you continue to have trouble accessing your account, feel free to contact our support team.`;
 
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token(valid for for 10mins)",
-      message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: "Your password reset token(valid for for 10mins)",
+    //   message,
+    // });
 
     res.status(200).json({
       status: "success",

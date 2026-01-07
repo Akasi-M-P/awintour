@@ -28,14 +28,11 @@ module.exports = class Email {
   // SEND ACTUAL EMAIL
   async send(template, subject) {
     // RENDER HTML BASED ON A PUG TEMPLATE
-    const html = pug.renderFile(
-      `${__dirname}/../views/emails/${template}.pug`,
-      {
-        firstName: this.firstName,
-        url: this.url,
-        subject,
-      }
-    );
+    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
+      firstName: this.firstName,
+      url: this.url,
+      subject,
+    });
 
     // DEFINE EMAIL OPTIONS
     const mailOptions = {
@@ -43,7 +40,6 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: options.message,
     };
 
     // CREATE A TRANSPORT AND SEND EMAIL
