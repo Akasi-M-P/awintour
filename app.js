@@ -40,6 +40,7 @@ app.use(
           "'self'",
           "https://api.mapbox.com",
           "https://cdn.jsdelivr.net",
+          "https://js.stripe.com",
         ],
         styleSrc: [
           "'self'",
@@ -53,8 +54,10 @@ app.use(
           "'self'",
           "https://api.mapbox.com",
           "https://events.mapbox.com",
+          "https://api.stripe.com",
         ],
         workerSrc: ["'self'", "blob:"],
+        frameSrc: ["'self'", "https://js.stripe.com"],
       },
     },
   })
