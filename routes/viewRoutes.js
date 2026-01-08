@@ -24,6 +24,9 @@ router.get("/login", authController.isLoggedIn, viewController.getLoginForm);
 // ROUTE FOR OPENING USER ACCOUNT/PROFILE
 router.get("/me", authController.protect, viewController.getAccount);
 
+// ROUTE FOR GETTING USER BOOKED TOURS
+router.get("/my-tours", authController.protect, viewController.getMyTours);
+
 // UPDATING USER DATA
 router.post(
   "/submit-user-data",
