@@ -1,13 +1,19 @@
 const express = require("express");
 const viewController = require("../controllers/viewController");
 const authController = require("../controllers/authController");
+const bookingController = require("../controllers/bookingController");
 
 const router = express.Router();
 
 // PUG ROUTES | SERVERSIDE RENDERING
 
 // ROUTE FOR THE OVERVIEW PAGE
-router.get("/", authController.isLoggedIn, viewController.getOverview);
+router.get(
+  "/",
+  bookingController.createBookingCheckout,
+  authController.isLoggedIn,
+  viewController.getOverview
+);
 
 // ROUTE FOR A TOUR PAGE
 router.get("/tour/:slug", authController.isLoggedIn, viewController.getTour);
