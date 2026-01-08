@@ -15,6 +15,7 @@ const AppError = require("./utils/appError");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const bookingRouter = require("./routes/bookingRoutes");
 const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
@@ -123,6 +124,9 @@ app.use("/api/v1/tours", tourRouter);
 
 // USER ROUTER USED
 app.use("/api/v1/users", userRouter);
+
+// BOOKING ROUTER USED
+app.use("/api/v1/bookings", bookingRouter);
 
 // REVIEW ROUTER USED
 app.use("/api/v1/reviews", reviewRouter);
