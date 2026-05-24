@@ -927,7 +927,7 @@ a  { color: inherit; text-decoration: none; }
   padding: 4rem 0;
 }
 .user-view__content { flex: 1; padding: 6rem 0; }
-.user-view__form-container { max-width: 68rem; margin: 0 auto; padding: 0 6rem; }
+.user-view__form-container { max-width: 68rem; margin: 0 auto; padding: 0 4rem; }
 .user-view__form-container--wide { max-width: none; padding: 0 4rem; }
 
 .side-nav { list-style: none; }
@@ -1092,9 +1092,21 @@ a  { color: inherit; text-decoration: none; }
   .cta__text { font-size: 1.7rem; }
   .span-all-rows { grid-column: auto; }
 
-  /* Booking cards — stack */
-  .booking-card { grid-template-columns: 8rem 1fr; grid-template-rows: auto auto; }
-  .booking-card__actions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+  /* Booking cards — stack to 2-col + full-width actions row */
+  .booking-card {
+    grid-template-columns: 8rem 1fr;
+    grid-template-rows: auto auto;
+    padding: 1.6rem;
+    gap: 1.2rem 1.6rem;
+  }
+  .booking-card__img { width: 8rem; height: 6rem; }
+  .booking-card__name { font-size: 1.6rem; }
+  .booking-card__actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: .8rem;
+  }
 
   /* Footer */
   .footer { grid-template-columns: 1fr; justify-items: center; row-gap: 1.2rem; }
@@ -1314,7 +1326,7 @@ a  { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: 10rem 1fr auto;
   align-items: center;
-  gap: 2.4rem;
+  gap: 2rem 2.4rem;
   background: var(--clr-surface);
   border: 1px solid var(--clr-border);
   border-radius: var(--r-lg);
@@ -1328,26 +1340,37 @@ a  { color: inherit; text-decoration: none; }
   height: 7rem;
   object-fit: cover;
   border-radius: var(--r-md);
+  flex-shrink: 0;
 }
 .booking-card__info { min-width: 0; }
 
 .booking-card__name {
   font-size: 1.7rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--clr-text);
-  margin-bottom: .6rem;
+  margin-bottom: .5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .booking-card__meta {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--clr-muted);
-  margin-bottom: .2rem;
+  margin-bottom: .3rem;
+  line-height: 1.5;
 }
-.booking-card__label { font-weight: 600; color: var(--clr-slate-400); }
+.booking-card__label {
+  font-weight: 600;
+  color: var(--clr-slate-700);
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
 .booking-card__price {
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 700;
   color: var(--clr-primary-500);
-  margin-top: .4rem;
+  margin-top: .6rem;
 }
 
 .booking-card__actions {
@@ -1371,19 +1394,22 @@ a  { color: inherit; text-decoration: none; }
 }
 .review-manage-card__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 1.2rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 .review-manage-card__tour {
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--clr-primary-400);
   text-decoration: none;
+  line-height: 1.4;
 }
 .review-manage-card__tour:hover { color: var(--clr-primary-300); }
-.review-manage-card__text { font-size: 1.5rem; color: var(--clr-muted); margin-bottom: 1.4rem; line-height: 1.6; }
-.review-manage-card__actions { display: flex; gap: .8rem; }
+.review-manage-card__text { font-size: 1.55rem; color: var(--clr-muted); margin-bottom: 1.4rem; line-height: 1.7; }
+.review-manage-card__actions { display: flex; gap: .8rem; flex-wrap: wrap; }
 
 /* ============================================================
    ADMIN TABLES

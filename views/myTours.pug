@@ -22,12 +22,11 @@ block content
                   .booking-card__info
                     h3.booking-card__name= item.tour.name
                     p.booking-card__meta
-                      span.booking-card__label Booked on
-                      | &nbsp;
+                      span.booking-card__label Booked on:&nbsp;
                       span= new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
                     p.booking-card__meta
-                      span.booking-card__label Duration
-                      | &nbsp;
+                      span.booking-card__label Duration:&nbsp;
                       span= `${item.tour.duration} days`
                     p.booking-card__price $#{item.price}
-                  a.btn.btn--green.btn--small(href=`/tour/${item.tour.slug}`) View tour
+                  .booking-card__actions
+                    a.btn.btn--green.btn--small(href=`/tour/${item.tour.slug}`) View tour
