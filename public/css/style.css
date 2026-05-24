@@ -318,7 +318,7 @@ a  { color: inherit; text-decoration: none; }
 .logo-text--footer { font-size: 1.9rem; opacity: .8; }
 
 @media (max-width: 62.5em) {
-  .header { flex-direction: column; height: auto; padding: 1.6rem 3rem; gap: 1.2rem; }
+  .header { height: auto; padding: 1.2rem 2.4rem; gap: 1rem; }
 }
 
 /* ============================================================
@@ -327,11 +327,6 @@ a  { color: inherit; text-decoration: none; }
 .nav { display: flex; align-items: center; }
 .nav--tours { flex: 0 1 40%; }
 .nav--user  { flex: 0 1 40%; justify-content: flex-end; }
-
-@media (max-width: 37.5em) {
-  .nav { flex-direction: column; }
-  .nav--tours { margin-bottom: 0; }
-}
 
 .nav__el,
 .nav__el:link,
@@ -1023,7 +1018,6 @@ a  { color: inherit; text-decoration: none; }
    RESPONSIVE — TABLET LANDSCAPE  (≤1000px)
    ============================================================ */
 @media (max-width: 62.5em) {
-  .header { padding: 1.6rem 2.4rem; }
   .heading-primary { font-size: 3.6rem; }
 
   /* Tour hero */
@@ -1114,7 +1108,33 @@ a  { color: inherit; text-decoration: none; }
 @media (max-width: 37.5em) {
   html { font-size: 56.25%; }
 
+  /* Header: logo + user on top row, nav links on bottom row */
+  .header {
+    display: grid;
+    grid-template-areas: "logo user" "tours tours";
+    grid-template-columns: auto 1fr;
+    padding: 1rem 1.6rem;
+    gap: .4rem;
+    height: auto;
+  }
+  .header__logo { grid-area: logo; animation: none; align-self: center; }
+  .nav--tours {
+    grid-area: tours;
+    flex: none;
+    justify-content: center;
+    gap: 2rem;
+    padding: .4rem 0;
+    border-top: 1px solid rgba(255,255,255,.07);
+  }
+  .nav--user {
+    grid-area: user;
+    flex: 1;
+    justify-content: flex-end;
+    align-items: center;
+  }
   .nav__el:not(:last-child) { margin-right: 1.4rem; }
+  /* Hide username text on mobile — show avatar only */
+  .nav__user-img + span { display: none; }
 
   .auth-card { padding: 3.2rem 2rem; }
 
