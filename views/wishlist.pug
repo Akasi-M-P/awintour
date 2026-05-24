@@ -1,0 +1,45 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'wishlist'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md My Wishlist
+
+          if !tours || tours.length === 0
+            .no-results
+              p No saved tours yet. Click the ♥ on any tour card to save it here.
+              a.btn.btn--green(href='/') Browse tours
+          else
+            .bookings-list.wishlist-list
+              each tour in tours
+                .booking-card(data-tour-id=`${tour._id}`)
+                  img.booking-card__img(src=`/img/tours/${tour.imageCover}` alt=tour.name)
+                  .booking-card__info
+                    h3.booking-card__name= tour.name
+                    p.booking-card__meta
+                      span.booking-card__label Location
+                      | &nbsp;
+                      span= tour.startLocation.description
+                    p.booking-card__meta
+                      span.booking-card__label Duration
+                      | &nbsp;
+                      span= `${tour.duration} days`
+                    p.booking-card__meta
+                      span.booking-card__label Difficulty
+                      | &nbsp;
+                      span(class=`card__badge card__badge--${tour.difficulty}`)= tour.difficulty
+                    p.booking-card__price
+                      | $#{tour.price}
+                      span.booking-card__meta  · ⭐ #{tour.ratingsAverage} (#{tour.ratingsQuantity})
+                  .booking-card__actions
+                    a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) View tour
+                    button.btn.btn--white.btn--small.wishlist-remove-btn(
+                      type='button'
+                      data-tour-id=`${tour._id}`
+                      aria-label='Remove from wishlist'
+                    ) Remove

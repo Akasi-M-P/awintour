@@ -26,32 +26,77 @@ exports.uploadTourImages = upload.fields([
 ]);
 
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
-  if (!req.files.imageCover || !req.files.images) return next();
+  if (!req.files) return next();
 
-  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  const tourId = req.params.id || `new-${Date.now()}`;
 
-  await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/tours/${req.body.imageCover}`);
+  if (req.files.imageCover) {
+    req.body.imageCover = `tour-${tourId}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${req.body.imageCover}`);
+  }
 
-  req.body.images = [];
-  await Promise.all(
-    req.files.images.map(async (file, i) => {
-      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
-
-      await sharp(file.buffer)
-        .resize(2000, 1333)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(`public/img/tours/${filename}`);
-
-      req.body.images.push(filename);
-    })
-  );
+  if (req.files.images) {
+    req.body.images = [];
+    await Promise.all(
+      req.files.images.map(async (file, i) => {
+        const filename = `tour-${tourId}-${Date.now()}-${i + 1}.jpeg`;
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/tours/${filename}`);
+        req.body.images.push(filename);
+      })
+    );
+  }
 
   next();
+});
+
+exports.adminCreateTour = catchAsync(async (req, res, next) => {
+  const b = req.body;
+
+  const startDates = [b.startDate1, b.startDate2, b.startDate3]
+    .filter(Boolean)
+    .map(d => new Date(d));
+
+  const startLocation = {
+    type: "Point",
+    description: b.startLocationDescription,
+    address: b.startLocationAddress || "",
+    coordinates: [
+      parseFloat(b.startLocationLng) || 0,
+      parseFloat(b.startLocationLat) || 0,
+    ],
+  };
+
+  const guides = b.guides
+    ? Array.isArray(b.guides) ? b.guides : [b.guides]
+    : [];
+
+  const tourData = {
+    name: b.name,
+    duration: Number(b.duration),
+    maxGroupSize: Number(b.maxGroupSize),
+    difficulty: b.difficulty,
+    price: Number(b.price),
+    summary: b.summary,
+    imageCover: b.imageCover,
+    startDates,
+    startLocation,
+    guides,
+  };
+  if (b.priceDiscount) tourData.priceDiscount = Number(b.priceDiscount);
+  if (b.description)   tourData.description   = b.description;
+  if (b.images)        tourData.images        = b.images;
+
+  const tour = await Tour.create(tourData);
+
+  res.status(201).json({ status: "success", data: { tour } });
 });
 
 exports.aliasTopTours = (req, res, next) => {

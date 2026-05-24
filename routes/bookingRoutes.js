@@ -7,8 +7,18 @@ const router = express.Router();
 
 router.use(authController.protect);
 
-// ROUTE FOR GETTING STRIPE CHECKOUT SESSION
-router.get("/checkout-session/:tourId", bookingController.getCheckoutSession);
+// Admin cannot go through Stripe checkout; they use the admin-book route instead
+router.get(
+  "/checkout-session/:tourId",
+  authController.restrictTo("user", "guide", "lead-guide"),
+  bookingController.getCheckoutSession
+);
+
+router.post(
+  "/admin-book",
+  authController.restrictTo("admin"),
+  bookingController.adminCreateBooking
+);
 
 router.use(authController.restrictTo("admin", "lead-guide"));
 

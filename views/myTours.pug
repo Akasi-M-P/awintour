@@ -1,0 +1,33 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'bookings'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md My Bookings
+
+          if !bookingDetails || bookingDetails.length === 0
+            .no-results
+              p You haven't booked any tours yet.
+              a.btn.btn--green(href='/') Browse tours
+          else
+            .bookings-list
+              each item in bookingDetails
+                .booking-card
+                  img.booking-card__img(src=`/img/tours/${item.tour.imageCover}` alt=`${item.tour.name}`)
+                  .booking-card__info
+                    h3.booking-card__name= item.tour.name
+                    p.booking-card__meta
+                      span.booking-card__label Booked on
+                      | &nbsp;
+                      span= new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                    p.booking-card__meta
+                      span.booking-card__label Duration
+                      | &nbsp;
+                      span= `${item.tour.duration} days`
+                    p.booking-card__price $#{item.price}
+                  a.btn.btn--green.btn--small(href=`/tour/${item.tour.slug}`) View tour

@@ -1,0 +1,41 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'manage-users'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container.user-view__form-container--wide
+          .admin-header
+            h2.heading-secondary Manage Users
+          if !users || users.length === 0
+            p.no-results No users found.
+          else
+            .admin-table-wrap
+              table.admin-table
+                thead
+                  tr
+                    th Photo
+                    th Name
+                    th Email
+                    th Role
+                    th Active
+                    th Actions
+                tbody
+                  each u in users
+                    tr
+                      td
+                        img.admin-table__img.admin-table__img--round(src=`/img/users/${u.photo}` alt=u.name)
+                      td= u.name
+                      td= u.email
+                      td
+                        span.admin-badge= u.role
+                      td= u.active !== false ? 'Yes' : 'No'
+                      td.admin-table__actions
+                        button.btn.btn--small.btn--red(
+                          data-id=`${u._id}`
+                          data-resource='users'
+                          data-action='delete'
+                        ) Delete

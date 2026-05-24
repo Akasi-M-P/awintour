@@ -2,10 +2,48 @@ extends base
 
 block content
   main.main
+    .hero-banner
+      h1.hero-banner__title
+        span.hero-word.heading-gradient Explore
+        |
+        span.hero-word the world
+      p.hero-banner__sub Handcrafted adventures for extraordinary travelers
+
+    form.filter-form(action='/' method='GET')
+      .filter-bar
+        .filter-bar__search
+          svg.filter-bar__icon
+            use(xlink:href='/img/icons.svg#icon-search')
+          input#filter-search.filter-bar__input(
+            type='text'
+            name='search'
+            placeholder='Search tours…'
+            value=query && query.search ? query.search : ''
+          )
+        .filter-bar__divider
+        .filter-bar__difficulty
+          span.filter-bar__label Difficulty
+          button.filter__diff-btn(type='button' data-difficulty='easy' class=query && query.difficulty === 'easy' ? 'active' : '') Easy
+          button.filter__diff-btn(type='button' data-difficulty='medium' class=query && query.difficulty === 'medium' ? 'active' : '') Medium
+          button.filter__diff-btn(type='button' data-difficulty='difficult' class=query && query.difficulty === 'difficult' ? 'active' : '') Difficult
+        .filter-bar__divider
+        .filter-bar__price
+          span.filter-bar__label Max price
+          input#filter-price(
+            type='range'
+            min='200'
+            max='3000'
+            step='100'
+            value=query && query['price'] && query['price']['lte'] ? query['price']['lte'] : '3000'
+          )
+          span#filter-price-display.filter-bar__price-val $3000
+        .filter-bar__actions
+          button.btn.btn--green.btn--small(type='submit') Apply
+          button.filter__clear-btn.btn.btn--white.btn--small(type='button') Clear
+
     .card-container
       each tour in tours
-        .card
-          // HEADER
+        .card(data-tour-id=`${tour._id}`)
           .card__header
             .card__picture
               .card__picture-overlay &nbsp;
@@ -13,15 +51,13 @@ block content
                 src=`/img/tours/${tour.imageCover}`
                 alt= tour.name
               )
+              div(class=`card__badge card__badge--${tour.difficulty}`)= tour.difficulty
 
             h3.heading-tertirary
               span= tour.name
 
-          // DETAILS
           .card__details
-            h4.card__sub-heading
-              | #{tour.difficulty} #{tour.duration}-day tour
-
+            h4.card__sub-heading= `${tour.duration}-day tour`
             p.card__text= tour.summary
 
             .card__data
@@ -31,12 +67,12 @@ block content
 
             .card__data
               svg.card__icon
-                use(xlink:href="img/icons.svg#icon-calendar")
+                use(xlink:href="/img/icons.svg#icon-calendar")
               span= new Date(tour.startDates[0]).toLocaleString('en-US', { month: 'long', year: 'numeric' })
 
             .card__data
               svg.card__icon
-                use(xlink:href="img/icons.svg#icon-flag")
+                use(xlink:href="/img/icons.svg#icon-flag")
               span #{tour.locations.length} stops
 
             .card__data
@@ -44,16 +80,20 @@ block content
                 use(xlink:href="/img/icons.svg#icon-user")
               span #{tour.maxGroupSize} people
 
-          // FOOTER
           .card__footer
             p
               span.card__footer-value $#{tour.price}
-              | 
+              | &nbsp;
               span.card__footer-text per person
-              
+
             p.card__ratings
               span.card__footer-value= tour.ratingsAverage
-              | 
-              span.card__footer-text rating (#{tour.ratingsQuantity})
+              | &nbsp;
+              span.card__footer-text (#{tour.ratingsQuantity})
 
             a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
+
+      if tours.length === 0
+        .no-results-full
+          p No tours match your search.
+          a.btn.btn--green(href='/') Clear filters

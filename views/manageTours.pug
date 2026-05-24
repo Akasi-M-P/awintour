@@ -1,0 +1,43 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'manage-tours'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container.user-view__form-container--wide
+          .admin-header
+            h2.heading-secondary Manage Tours
+            a.btn.btn--green.btn--small(href='/create-tour') + New Tour
+          if !tours || tours.length === 0
+            p.no-results No tours found.
+          else
+            .admin-table-wrap
+              table.admin-table
+                thead
+                  tr
+                    th Image
+                    th Name
+                    th Price
+                    th Difficulty
+                    th Rating
+                    th Actions
+                tbody
+                  each tour in tours
+                    tr
+                      td
+                        img.admin-table__img(src=`/img/tours/${tour.imageCover}` alt=tour.name)
+                      td= tour.name
+                      td $#{tour.price}
+                      td
+                        span(class=`card__badge card__badge--${tour.difficulty}`)= tour.difficulty
+                      td= tour.ratingsAverage
+                      td.admin-table__actions
+                        a.btn.btn--small.btn--green(href=`/tour/${tour.slug}`) View
+                        button.btn.btn--small.btn--red(
+                          data-id=`${tour._id}`
+                          data-resource='tours'
+                          data-action='delete'
+                        ) Delete

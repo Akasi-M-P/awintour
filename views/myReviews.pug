@@ -1,0 +1,53 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'reviews'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container
+          h2.heading-secondary.ma-bt-md My Reviews
+
+          if !reviews || reviews.length === 0
+            .no-results
+              p You haven't written any reviews yet.
+              a.btn.btn--green(href='/') Find a tour
+          else
+            .reviews-manage-list
+              each review in reviews
+                .review-manage-card
+                  .review-manage-card__header
+                    a.review-manage-card__tour(href=`/tour/${review.tour.slug}`)= review.tour.name
+                    .reviews__rating
+                      each star in [1,2,3,4,5]
+                        svg.reviews__star(class=`reviews__star--${review.rating >= star ? 'active' : 'inactive'}`)
+                          use(xlink:href='/img/icons.svg#icon-star')
+                  p.review-manage-card__text= review.review
+                  .review-manage-card__actions
+                    button.btn.btn--small.btn--green(
+                      data-review-id=`${review._id}`
+                      data-rating=`${review.rating}`
+                      data-text=`${review.review}`
+                      data-action='edit'
+                    ) Edit
+                    button.btn.btn--small.btn--red(
+                      data-review-id=`${review._id}`
+                      data-action='delete'
+                    ) Delete
+
+          .review-edit-modal
+            .review-edit-modal__backdrop
+            .review-edit-modal__box
+              h3.review-edit-modal__title Edit Review
+              .star-rating
+                each val in [5,4,3,2,1]
+                  input(type='radio' name='edit-rating' id=`edit-star${val}` value=`${val}`)
+                  label(for=`edit-star${val}`)
+                    svg(viewBox='0 0 24 24')
+                      use(xlink:href='/img/icons.svg#icon-star')
+              textarea#edit-review-text.form__input(rows='4' placeholder='Your review...')
+              .review-edit-modal__btns
+                button.btn.btn--green#confirm-edit Save
+                button.btn.btn--white#cancel-edit Cancel

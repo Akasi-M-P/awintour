@@ -1,0 +1,39 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'manage-bookings'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container.user-view__form-container--wide
+          .admin-header
+            h2.heading-secondary Manage Bookings
+          if !bookings || bookings.length === 0
+            p.no-results No bookings found.
+          else
+            .admin-table-wrap
+              table.admin-table
+                thead
+                  tr
+                    th User
+                    th Tour
+                    th Price
+                    th Date
+                    th Paid
+                    th Actions
+                tbody
+                  each booking in bookings
+                    tr
+                      td= booking.user ? booking.user.name : '—'
+                      td= booking.tour ? booking.tour.name : '—'
+                      td $#{booking.price}
+                      td= new Date(booking.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                      td= booking.paid ? 'Yes' : 'No'
+                      td.admin-table__actions
+                        button.btn.btn--small.btn--red(
+                          data-id=`${booking._id}`
+                          data-resource='bookings'
+                          data-action='delete'
+                        ) Delete

@@ -1,0 +1,119 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'manage-tours'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container
+          .admin-header
+            h2.heading-secondary Create New Tour
+            a.btn.btn--white.btn--small(href='/manage-tours') ← Back to tours
+
+          form.form.form--create-tour(enctype='multipart/form-data')
+
+            h3.form-section__title Basic Information
+            .form-row
+              .form__group
+                label.form__label(for='name') Tour name *
+                input#name.form__input(
+                  type='text' name='name' required
+                  minlength='10' maxlength='40'
+                  placeholder='The Forest Hiker'
+                )
+              .form__group
+                label.form__label(for='difficulty') Difficulty *
+                select#difficulty.form__input(name='difficulty' required)
+                  option(value='') Select difficulty…
+                  option(value='easy') Easy
+                  option(value='medium') Medium
+                  option(value='difficult') Difficult
+
+            .form-row
+              .form__group
+                label.form__label(for='duration') Duration (days) *
+                input#duration.form__input(type='number' name='duration' required min='1' placeholder='7')
+              .form__group
+                label.form__label(for='maxGroupSize') Max group size *
+                input#maxGroupSize.form__input(type='number' name='maxGroupSize' required min='1' placeholder='25')
+
+            .form-row
+              .form__group
+                label.form__label(for='price') Price ($) *
+                input#price.form__input(type='number' name='price' required min='0' placeholder='997')
+              .form__group
+                label.form__label(for='priceDiscount') Price discount ($)
+                input#priceDiscount.form__input(type='number' name='priceDiscount' min='0' placeholder='Optional')
+
+            h3.form-section__title Description
+            .form__group
+              label.form__label(for='summary') Summary *
+              textarea#summary.form__input(name='summary' rows='2' required placeholder='Brief exciting overview of the tour')
+            .form__group
+              label.form__label(for='description') Full description
+              textarea#description.form__input(name='description' rows='5' placeholder='Detailed description — use line breaks for paragraphs')
+
+            h3.form-section__title Images
+            .form-row
+              .form__group
+                label.form__label(for='imageCover') Cover image *
+                input#imageCover.form__input.form__input--file(type='file' name='imageCover' accept='image/*' required)
+                .file-preview#cover-preview
+              .form__group
+                label.form__label(for='images') Gallery images (max 3)
+                input#images.form__input.form__input--file(type='file' name='images' accept='image/*' multiple)
+                .file-preview#gallery-preview
+
+            h3.form-section__title Start Dates
+            .form-row
+              .form__group
+                label.form__label(for='startDate1') Date 1 *
+                input#startDate1.form__input(type='date' name='startDate1' required)
+              .form__group
+                label.form__label(for='startDate2') Date 2
+                input#startDate2.form__input(type='date' name='startDate2')
+              .form__group
+                label.form__label(for='startDate3') Date 3
+                input#startDate3.form__input(type='date' name='startDate3')
+
+            h3.form-section__title Start Location
+            .form-row
+              .form__group
+                label.form__label(for='startLocationDescription') City / Region *
+                input#startLocationDescription.form__input(
+                  type='text' name='startLocationDescription' required
+                  placeholder='Miami, USA'
+                )
+              .form__group
+                label.form__label(for='startLocationAddress') Street address
+                input#startLocationAddress.form__input(
+                  type='text' name='startLocationAddress'
+                  placeholder='301 Biscayne Blvd'
+                )
+            .form-row
+              .form__group
+                label.form__label(for='startLocationLat') Latitude *
+                input#startLocationLat.form__input(
+                  type='number' name='startLocationLat' required
+                  step='0.000001' placeholder='25.7617'
+                )
+              .form__group
+                label.form__label(for='startLocationLng') Longitude *
+                input#startLocationLng.form__input(
+                  type='number' name='startLocationLng' required
+                  step='0.000001' placeholder='-80.1918'
+                )
+
+            if guides && guides.length
+              h3.form-section__title Guides
+              .form__group
+                label.form__label(for='guides') Assign guides
+                p.form__hint Hold Ctrl / Cmd to select multiple
+                select#guides.form__input(name='guides' multiple size=`${Math.min(guides.length, 6)}`)
+                  each guide in guides
+                    option(value=`${guide._id}`) #{guide.name} — #{guide.role}
+
+            .form__group.ma-bt-lg
+              button.btn.btn--green.btn--full(type='submit') Create Tour

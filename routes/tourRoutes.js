@@ -36,6 +36,15 @@ router
 // GET DISTANCES OF TOURS FROM A POINT
 router.route("/distances/:latlng/unit/:unit").get(tourController.getDistances);
 
+router.post(
+  "/admin-create",
+  authController.protect,
+  authController.restrictTo("admin", "lead-guide"),
+  tourController.uploadTourImages,
+  tourController.resizeTourImages,
+  tourController.adminCreateTour
+);
+
 router
   .route("/")
   .get(tourController.getAllTours)

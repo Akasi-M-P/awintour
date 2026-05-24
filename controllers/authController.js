@@ -45,11 +45,13 @@ const createSendToken = (user, statusCode, res) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
-  const url = `${req.protocol}://${req.get("host")}/me`;
+  try {
+    const url = `${req.protocol}://${req.get("host")}/me`;
+    await new Email(newUser, url).sendWelcome();
+  } catch (err) {
+    // email failure must not block account creation
+  }
 
-  await new Email(newUser, url).sendWelcome();
-
-  //GENERATES UNIQUE TOKEN FOR USER
   createSendToken(newUser, 201, res);
 });
 

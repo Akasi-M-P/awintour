@@ -59,12 +59,38 @@ exports.webhookCheckout = async (req, res, next) => {
     return res.status(400).send(`Webhook error: ${err.message}`);
   }
 
-  if (event.type === "checkout.session.completed") {
-    await createBookingFromSession(event.data.object);
+  try {
+    if (event.type === "checkout.session.completed") {
+      await createBookingFromSession(event.data.object);
+    }
+  } catch (err) {
+    console.error("Failed to create booking from session:", err.message);
+    return res.status(500).json({ error: "Booking creation failed" });
   }
 
   res.status(200).json({ received: true });
 };
+
+exports.adminCreateBooking = catchAsync(async (req, res, next) => {
+  const { tourId, userEmail } = req.body;
+
+  const tour = await Tour.findById(tourId);
+  if (!tour) return next(new AppError("No tour found with that ID.", 404));
+
+  const User = require("../models/userModel");
+  const user = await User.findOne({ email: userEmail });
+  if (!user) return next(new AppError("No user found with that email address.", 404));
+
+  const existing = await Booking.findOne({ tour: tourId, user: user._id });
+  if (existing) return next(new AppError("This user already has a booking for this tour.", 400));
+
+  await Booking.create({ tour: tour._id, user: user._id, price: tour.price });
+
+  res.status(201).json({
+    status: "success",
+    message: `"${tour.name}" booked for ${user.name} (${user.email}).`,
+  });
+});
 
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);
