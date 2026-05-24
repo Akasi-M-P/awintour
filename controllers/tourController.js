@@ -5,7 +5,6 @@ const Tour = require("./../models/tourModel");
 const catchAsync = require("./../utils/catchAsync");
 const factory = require("./handlerFactory");
 
-// UPLOADING FILES USING MULTER MIDDDLEWARE IF PHOTO RESIZING IS REQUIRED
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -21,17 +20,14 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-//THIS UPLOADS TOUR IMAGES
 exports.uploadTourImages = upload.fields([
   { name: "imageCover", maxCount: 1 },
   { name: "images", maxCount: 3 },
 ]);
 
-// RESIZES TOUR IMAGES
 exports.resizeTourImages = catchAsync(async (req, res, next) => {
   if (!req.files.imageCover || !req.files.images) return next();
 
-  // RESIZING OF COVER IMAGE
   req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
 
   await sharp(req.files.imageCover[0].buffer)
@@ -40,9 +36,9 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
     .jpeg({ quality: 90 })
     .toFile(`public/img/tours/${req.body.imageCover}`);
 
-  // RESIZING OF OTHER IMAGES
+  req.body.images = [];
   await Promise.all(
-    req.files.images.forEach(async (file, i) => {
+    req.files.images.map(async (file, i) => {
       const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
 
       await sharp(file.buffer)
@@ -58,86 +54,23 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
   next();
 });
 
-// THIS ROUTES GETS THE TOP 5 CHEAPEST TOURS
 exports.aliasTopTours = (req, res, next) => {
-  console.log("Alias middleware triggered");
   req.query.fields = "name,price,ratingsAverage,summary,difficulty";
   req.query.sort = "-ratingsAverage,price";
   req.query.limit = "5";
-  console.log("Alias middleware triggered");
-  console.log("Modified query:", req.query);
   next();
 };
 
-// GET ALL TOURS
 exports.getAllTours = factory.getAll(Tour);
 
-// // GET A TOUR
 exports.getTour = factory.getOne(Tour, { path: "reviews" });
 
-// // GET A TOUR
-// exports.getTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findById(req.params.id).populate("reviews");
-
-//   // WHEN THERE IS NO TOUR FOUND WITH AN ID
-//   if (!tour) {
-//     return next(new AppError("No tour found with that ID", 404));
-//   }
-
-//   // SEND TOUR TO CLIENT
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       tour,
-//     },
-//   });
-// });
-
-// CREATE A NEW TOUR
 exports.createTour = factory.createOne(Tour);
 
-// UPDATE TOUR
 exports.updateTour = factory.updateOne(Tour);
 
-// UPDATE TOUR
-// exports.updateTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-//     new: true,
-//     runValidators: true,
-//   });
-
-//   // WHEN THERE IS NO TOUR FOUND WITH AN ID
-//   if (!tour) {
-//     return next(new AppError("No tour found with that ID", 404));
-//   }
-
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       tour,
-//     },
-//   });
-// });
-
-// DELETE TOUR
-// exports.deleteTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findByIdAndDelete(req.params.id);
-
-//   // WHEN THERE IS NO TOUR FOUND WITH AN ID
-//   if (!tour) {
-//     return next(new AppError("No tour found with that ID", 404));
-//   }
-
-//   res.status(204).json({
-//     status: "success",
-//     data: null,
-//   });
-// });
-
-// DELETE TOUR USING FACTORY HANDLER INSTEAD OF ABOVE
 exports.deleteTour = factory.deleteOne(Tour);
 
-// GET TOUR STATISTICS
 exports.getTourStats = catchAsync(async (req, res) => {
   const stats = await Tour.aggregate([
     {
@@ -171,7 +104,6 @@ exports.getTourStats = catchAsync(async (req, res) => {
   });
 });
 
-// GET MONTHLY STATISTICS
 exports.getMonthlyPlan = catchAsync(async (req, res) => {
   const year = req.params.year * 1;
   const plan = await Tour.aggregate([
@@ -217,7 +149,6 @@ exports.getMonthlyPlan = catchAsync(async (req, res) => {
   });
 });
 
-// GET TOURS WITHIN A CERTAIN DISTANCE
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
 
@@ -226,7 +157,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
 
   if (!lat || !lng) {
-    next(
+    return next(
       new AppError(
         "Please provide latitude and longitude in the format lat,lng.",
         400
@@ -247,7 +178,6 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   });
 });
 
-// GET DISTANCES OF TOURS FROM A POINT OF LOCATION
 exports.getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
   const [lat, lng] = latlng.split(",");
@@ -255,7 +185,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
   const multiplier = unit === "mi" ? 0.000621371 : 0.001;
 
   if (!lat || !lng) {
-    next(
+    return next(
       new AppError(
         "Please provide latitude and longitude in the format lat,lng.",
         400

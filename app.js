@@ -13,6 +13,7 @@ const cors = require("cors");
 // CUSTOM MODULES
 const globalErrorHandler = require("./controllers/errorController");
 const AppError = require("./utils/appError");
+const bookingController = require("./controllers/bookingController");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
@@ -21,23 +22,28 @@ const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
 
-// PART 2 | CLIENT SIDE | SET APP TO USE PUG AS THE TEMPLATE ENGINE
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
-// GLOBAL MODULES
+// CORS — restrict to configured origin in production
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV !== "production"),
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.options("/{*any}", cors(corsOptions));
 
-// IMPLEMENT CORS TO ALLOW ACCESS-CONTROL-ALLOW-ORIGIN
-app.use(cors());
-
-app.options("*", cors());
+// STRIPE WEBHOOK — must receive raw body, registered before JSON parser
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  bookingController.webhookCheckout
+);
 
 // STATIC FILES URL DIRECTORY
 app.use(express.static(path.join(__dirname, "public")));
 
 // SET SECURITY HTTP HEADERS
-// app.use(helmet());
-
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -70,10 +76,8 @@ app.use(
   })
 );
 
-// 👇 THIS LINE FIXES YOUR ISSUE
 app.set("query parser", "extended");
 
-// DEVELOPMENT LOGGING
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
@@ -82,32 +86,31 @@ if (process.env.NODE_ENV === "development") {
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
-  message: "Too many requets from this IP address, please try again in an hour",
+  message: "Too many requests from this IP address, please try again in an hour",
 });
 
 app.use("/api", limiter);
 
-// BODY PARSER, READS DATA FROM BODY INTO REQ.BODY
+// BODY PARSER
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(cookieParser());
 
-// // DATA SANITIZATION AGAINST NOSQL QUERY INJECTION
-// app.use(mongoSanitize());
-
+// Make req.query writable for mongoSanitize compatibility
 app.use((req, res, next) => {
   Object.defineProperty(req, "query", {
-    value: { ...req.query }, // Create a shallow copy
-    writable: true, // Make it writable
+    value: { ...req.query },
+    writable: true,
     configurable: true,
     enumerable: true,
   });
   next();
 });
-// Place your sanitization middleware after this
+
+// DATA SANITIZATION AGAINST NOSQL QUERY INJECTION
 app.use(mongoSanitize());
 
-// DATA SANITIZATIO AGAINST XXS
+// DATA SANITIZATION AGAINST XSS
 app.use(xxs());
 
 // PREVENTS PARAMETER POLLUTION
@@ -124,27 +127,15 @@ app.use(
   })
 );
 
-// THIS COMPRESSES TEXTSIN OUR APP:BEFORE DEPLOYMENT
 app.use(compression());
 
 // ROUTES
-
-// VIEWS ROUTER USED
 app.use("/", viewRouter);
-
-// TOUR ROUTER USED
 app.use("/api/v1/tours", tourRouter);
-
-// USER ROUTER USED
 app.use("/api/v1/users", userRouter);
-
-// BOOKING ROUTER USED
 app.use("/api/v1/bookings", bookingRouter);
-
-// REVIEW ROUTER USED
 app.use("/api/v1/reviews", reviewRouter);
 
-// UNHANDLED ROUTES
 app.all("/{*any}", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
