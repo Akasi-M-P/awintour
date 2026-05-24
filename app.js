@@ -19,6 +19,7 @@ const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const bookingRouter = require("./routes/bookingRoutes");
 const viewRouter = require("./routes/viewRoutes");
+const { streamFromS3, s3Available } = require("./utils/s3");
 
 const app = express();
 
@@ -39,6 +40,16 @@ app.post(
   express.raw({ type: "application/json" }),
   bookingController.webhookCheckout
 );
+
+// S3 image proxy — serves /img/* from S3 when bucket is configured
+app.get("/img/*", async (req, res, next) => {
+  if (!s3Available()) return next();
+  try {
+    await streamFromS3(req.path.slice(1), res);
+  } catch {
+    next();
+  }
+});
 
 // STATIC FILES URL DIRECTORY
 app.use(express.static(path.join(__dirname, "public")));

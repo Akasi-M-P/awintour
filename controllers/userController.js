@@ -1,9 +1,11 @@
+const fs = require("fs").promises;
 const multer = require("multer");
 const sharp = require("sharp");
 const User = require("./../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
 const factory = require("./handlerFactory");
+const { uploadToS3, s3Available } = require("../utils/s3");
 
 // UPLOADING FILES USING MULTER MIDDDLEWARE IF PHOTO RESIZING IS NOT REQUIRED
 // const multerStorage = multer.diskStorage({
@@ -37,11 +39,17 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
+  const buffer = await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    .toBuffer();
+
+  if (s3Available()) {
+    await uploadToS3(buffer, `img/users/${req.file.filename}`);
+  } else {
+    await fs.writeFile(`public/img/users/${req.file.filename}`, buffer);
+  }
 
   next();
 });

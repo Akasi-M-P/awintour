@@ -1,9 +1,11 @@
+const fs = require("fs").promises;
 const multer = require("multer");
 const sharp = require("sharp");
 const AppError = require("../utils/appError");
 const Tour = require("./../models/tourModel");
 const catchAsync = require("./../utils/catchAsync");
 const factory = require("./handlerFactory");
+const { uploadToS3, s3Available } = require("../utils/s3");
 
 const multerStorage = multer.memoryStorage();
 
@@ -32,11 +34,16 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
 
   if (req.files.imageCover) {
     req.body.imageCover = `tour-${tourId}-${Date.now()}-cover.jpeg`;
-    await sharp(req.files.imageCover[0].buffer)
+    const coverBuf = await sharp(req.files.imageCover[0].buffer)
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 90 })
-      .toFile(`public/img/tours/${req.body.imageCover}`);
+      .toBuffer();
+    if (s3Available()) {
+      await uploadToS3(coverBuf, `img/tours/${req.body.imageCover}`);
+    } else {
+      await fs.writeFile(`public/img/tours/${req.body.imageCover}`, coverBuf);
+    }
   }
 
   if (req.files.images) {
@@ -44,11 +51,16 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
     await Promise.all(
       req.files.images.map(async (file, i) => {
         const filename = `tour-${tourId}-${Date.now()}-${i + 1}.jpeg`;
-        await sharp(file.buffer)
+        const buf = await sharp(file.buffer)
           .resize(2000, 1333)
           .toFormat("jpeg")
           .jpeg({ quality: 90 })
-          .toFile(`public/img/tours/${filename}`);
+          .toBuffer();
+        if (s3Available()) {
+          await uploadToS3(buf, `img/tours/${filename}`);
+        } else {
+          await fs.writeFile(`public/img/tours/${filename}`, buf);
+        }
         req.body.images.push(filename);
       })
     );
