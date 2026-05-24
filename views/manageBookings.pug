@@ -30,7 +30,8 @@ block content
                       td= booking.tour ? booking.tour.name : '—'
                       td $#{booking.price}
                       td= new Date(booking.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-                      td= booking.paid ? 'Yes' : 'No'
+                      td
+                        span(class=`admin-badge admin-badge--${booking.paid ? 'yes' : 'no'}`)= booking.paid ? 'Paid' : 'Unpaid'
                       td.admin-table__actions
                         button.btn.btn--small.btn--red(
                           data-id=`${booking._id}`

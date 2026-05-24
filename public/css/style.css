@@ -1033,7 +1033,9 @@ a  { color: inherit; text-decoration: none; }
   /* Account sidebar → horizontal top nav */
   .user-view { flex-direction: column; }
   .user-view__menu { flex: 0 0 auto; padding: 1.6rem 0 0; }
-  .user-view__content { padding: 4rem 0; }
+  .user-view__content { padding: 3rem 0; }
+  .admin-table { min-width: 62rem; font-size: 1.4rem; }
+  .admin-table td { padding: 1.2rem 1.4rem; font-size: 1.35rem; }
   .side-nav { display: flex; flex-wrap: wrap; padding: 0 1.6rem; }
   .side-nav li { margin: 0; }
   .side-nav a:link,
@@ -1173,8 +1175,10 @@ a  { color: inherit; text-decoration: none; }
   .side-nav svg { height: 1.6rem; width: 1.6rem; }
 
   /* Admin tables */
-  .admin-table { min-width: 52rem; }
-  .admin-table-wrap { -webkit-overflow-scrolling: touch; }
+  .admin-table { min-width: 56rem; font-size: 1.35rem; }
+  .admin-table th { padding: 1rem 1.2rem; font-size: 1.1rem; }
+  .admin-table td { padding: 1.1rem 1.2rem; font-size: 1.3rem; }
+  .user-view__content { padding: 2.4rem 0; }
 
   /* Filter bar */
   .filter-bar { padding: 1.2rem 1.4rem; gap: .8rem; }
@@ -1420,44 +1424,62 @@ a  { color: inherit; text-decoration: none; }
 /* ============================================================
    ADMIN TABLES
    ============================================================ */
-.admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; }
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-bottom: 2.4rem;
+}
 
-.admin-table-wrap { overflow-x: auto; }
+.admin-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-lg);
+}
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  min-width: 68rem;
 }
 .admin-table th {
   text-align: left;
   padding: 1.2rem 1.6rem;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: var(--clr-muted);
+  color: var(--clr-slate-500);
+  background: var(--clr-slate-50);
   border-bottom: 1px solid var(--clr-border);
+  white-space: nowrap;
 }
 .admin-table td {
   padding: 1.4rem 1.6rem;
   color: var(--clr-text);
-  border-bottom: 1px solid rgba(255,255,255,.04);
+  border-bottom: 1px solid var(--clr-border);
   vertical-align: middle;
+  font-size: 1.45rem;
 }
 .admin-table tr:last-child td { border-bottom: none; }
-.admin-table tr:hover td { background: rgba(255,255,255,.03); }
+.admin-table tbody tr:hover td { background: var(--clr-slate-50); }
 
 .admin-table__img {
-  width: 5rem;
-  height: 3.5rem;
+  width: 5.6rem;
+  height: 3.8rem;
   object-fit: cover;
   border-radius: var(--r-sm);
+  display: block;
 }
 .admin-table__img--round {
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 3.8rem;
+  height: 3.8rem;
   border-radius: 50%;
+  object-fit: cover;
 }
 .admin-table th:last-child,
 .admin-table td:last-child {
@@ -1465,24 +1487,37 @@ a  { color: inherit; text-decoration: none; }
   right: 0;
   background: var(--clr-surface);
   z-index: 1;
-  box-shadow: -4px 0 8px rgba(0,0,0,.06);
+  box-shadow: -4px 0 10px rgba(0,0,0,.07);
 }
-.admin-table tr:hover td:last-child { background: var(--clr-slate-50); }
+.admin-table th:last-child { background: var(--clr-slate-50); }
+.admin-table tbody tr:hover td:last-child { background: var(--clr-slate-50); }
 
-.admin-table__actions { display: flex; gap: .8rem; }
-.admin-table__review { max-width: 28rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-table__actions { display: flex; gap: .8rem; align-items: center; }
+.admin-table__review {
+  max-width: 26rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--clr-muted);
+}
 
 .admin-user-cell { display: flex; align-items: center; gap: 1rem; }
 
+/* Role / status badges */
 .admin-badge {
   display: inline-block;
-  padding: .3rem .9rem;
-  border-radius: 2rem;
+  padding: .35rem 1rem;
+  border-radius: var(--r-full);
   font-size: 1.2rem;
   font-weight: 600;
-  background: rgba(249,115,22,.15);
-  color: var(--clr-primary-400);
+  white-space: nowrap;
 }
+.admin-badge--admin    { background: rgba(239,68,68,.12);  color: #dc2626; }
+.admin-badge--lead-guide { background: rgba(249,115,22,.15); color: var(--clr-primary-600); }
+.admin-badge--guide    { background: rgba(59,130,246,.12); color: #2563eb; }
+.admin-badge--user     { background: var(--clr-slate-100); color: var(--clr-slate-600); }
+.admin-badge--yes      { background: rgba(34,197,94,.12);  color: #16a34a; }
+.admin-badge--no       { background: rgba(239,68,68,.1);   color: #dc2626; }
 
 /* ============================================================
    CAPACITY BAR (tour detail)

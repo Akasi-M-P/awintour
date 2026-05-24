@@ -31,8 +31,9 @@ block content
                       td= u.name
                       td= u.email
                       td
-                        span.admin-badge= u.role
-                      td= u.active !== false ? 'Yes' : 'No'
+                        span(class=`admin-badge admin-badge--${u.role}`)= u.role
+                      td
+                        span(class=`admin-badge admin-badge--${u.active !== false ? 'yes' : 'no'}`)= u.active !== false ? 'Active' : 'Inactive'
                       td.admin-table__actions
                         button.btn.btn--small.btn--red(
                           data-id=`${u._id}`
