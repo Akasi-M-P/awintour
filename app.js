@@ -42,7 +42,7 @@ app.post(
 );
 
 // S3 image proxy — serves /img/* from S3 when bucket is configured
-app.get("/img/*", async (req, res, next) => {
+app.get("/img/*path", async (req, res, next) => {
   if (!s3Available()) return next();
   try {
     await streamFromS3(req.path.slice(1), res);
