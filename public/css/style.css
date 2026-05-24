@@ -1071,6 +1071,9 @@ a  { color: inherit; text-decoration: none; }
   /* Tour description */
   .section-description > * { padding: 4rem 6vw; }
 
+  /* Map */
+  .section-map { height: 50rem; }
+
   /* Tour pictures — stack vertically */
   .section-pictures { flex-wrap: wrap; clip-path: none; margin-top: 0; }
   .picture-box { width: 100%; }
@@ -1154,6 +1157,9 @@ a  { color: inherit; text-decoration: none; }
   .section-header { height: 80vw; }
   .heading-primary { font-size: 2.6rem; }
   .heading-box { width: 92%; text-align: center; }
+
+  /* Map */
+  .section-map { height: 38rem; }
 
   /* Dates grid */
   .dates-grid { grid-template-columns: repeat(2, 1fr); }
