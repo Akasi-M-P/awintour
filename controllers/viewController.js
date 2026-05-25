@@ -112,6 +112,15 @@ exports.getCreateTourForm = catchAsync(async (req, res) => {
   res.status(200).render("createTour", { title: "Create New Tour", guides });
 });
 
+exports.getEditTourForm = catchAsync(async (req, res, next) => {
+  const tour = await Tour.findById(req.params.id)
+    .setOptions({ includeSecret: true })
+    .populate("guides", "name role");
+  if (!tour) return next(new AppError("No tour found with that ID", 404));
+  const guides = await User.find({ role: { $in: ["guide", "lead-guide"] } }).select("name role");
+  res.status(200).render("editTour", { title: `Edit: ${tour.name}`, tour, guides });
+});
+
 exports.getManageUsers = catchAsync(async (req, res) => {
   const users = await User.find().setOptions({ includeInactive: true }).select("name email role photo active");
   res.status(200).render("manageUsers", { title: "Manage Users", users });

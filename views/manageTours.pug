@@ -36,6 +36,13 @@ block content
                         span(class=`card__badge card__badge--${tour.difficulty}`)= tour.difficulty
                       td(data-label='Rating')= tour.ratingsAverage
                       td.admin-table__actions
+                        a.admin-icon-btn.admin-icon-btn--edit(
+                          href=`/edit-tour/${tour._id}`
+                          title='Edit tour'
+                          aria-label='Edit tour'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href='/img/icons.svg#icon-edit')
                         button.admin-icon-btn.admin-icon-btn--toggle(
                           data-id=`${tour._id}`
                           data-resource='tours'

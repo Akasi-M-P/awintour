@@ -45,6 +45,15 @@ router.post(
   tourController.adminCreateTour
 );
 
+router.patch(
+  "/admin-update/:id",
+  authController.protect,
+  authController.restrictTo("admin", "lead-guide"),
+  tourController.uploadTourImages,
+  tourController.resizeTourImages,
+  tourController.adminUpdateTour
+);
+
 router
   .route("/")
   .get(tourController.getAllTours)

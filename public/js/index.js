@@ -11,7 +11,7 @@ import { initLightbox } from "./lightbox";
 import { initWishlistButtons, initWishlistRemove } from "./wishlist";
 import { initAdminActions } from "./admin";
 import { initAdminBooking } from "./adminBooking";
-import { initCreateTour } from "./createTour";
+import { initCreateTour, initEditTour } from "./createTour";
 import {
   initCardTilt,
   initMagneticButtons,
@@ -138,6 +138,7 @@ document.querySelectorAll("[data-action='delete']").forEach(btn => {
 initAdminActions();
 initAdminBooking();
 initCreateTour();
+initEditTour();
 
 // ── Auth forms ─────────────────────────────────────────────────────────────────
 const loginForm    = document.querySelector(".form--login");

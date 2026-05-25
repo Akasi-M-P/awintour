@@ -111,6 +111,53 @@ exports.adminCreateTour = catchAsync(async (req, res, next) => {
   res.status(201).json({ status: "success", data: { tour } });
 });
 
+exports.adminUpdateTour = catchAsync(async (req, res, next) => {
+  const b = req.body;
+  const update = {};
+
+  if (b.name)         update.name         = b.name;
+  if (b.duration)     update.duration     = Number(b.duration);
+  if (b.maxGroupSize) update.maxGroupSize = Number(b.maxGroupSize);
+  if (b.difficulty)   update.difficulty   = b.difficulty;
+  if (b.price)        update.price        = Number(b.price);
+  if (b.summary)      update.summary      = b.summary;
+  if (b.description !== undefined) update.description   = b.description;
+  if (b.priceDiscount !== undefined && b.priceDiscount !== "")
+                      update.priceDiscount = Number(b.priceDiscount);
+  if (b.imageCover)   update.imageCover   = b.imageCover;
+  if (b.images)       update.images       = b.images;
+
+  const startDates = [b.startDate1, b.startDate2, b.startDate3]
+    .filter(Boolean).map(d => new Date(d));
+  if (startDates.length) update.startDates = startDates;
+
+  if (b.startLocationLat || b.startLocationLng || b.startLocationDescription) {
+    update.startLocation = {
+      type: "Point",
+      description: b.startLocationDescription || "",
+      address:     b.startLocationAddress     || "",
+      coordinates: [
+        parseFloat(b.startLocationLng) || 0,
+        parseFloat(b.startLocationLat) || 0,
+      ],
+    };
+  }
+
+  if (b.guides !== undefined) {
+    update.guides = b.guides
+      ? (Array.isArray(b.guides) ? b.guides : [b.guides])
+      : [];
+  }
+
+  const tour = await Tour.findByIdAndUpdate(req.params.id, update, {
+    new: true,
+    runValidators: true,
+  });
+  if (!tour) return next(new AppError("No tour found with that ID", 404));
+
+  res.status(200).json({ status: "success", data: { tour } });
+});
+
 exports.aliasTopTours = (req, res, next) => {
   req.query.fields = "name,price,ratingsAverage,summary,difficulty";
   req.query.sort = "-ratingsAverage,price";

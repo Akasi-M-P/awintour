@@ -1,0 +1,133 @@
+extends base
+
+block content
+  main.main
+    .user-view
+      - const activeSection = 'manage-tours'
+      include _accountNav
+
+      .user-view__content
+        .user-view__form-container
+          .admin-header
+            h2.heading-secondary Edit Tour
+            a.btn.btn--white.btn--small(href='/manage-tours') ← Back to tours
+
+          form.form.form--edit-tour(enctype='multipart/form-data' data-tour-id=`${tour._id}`)
+
+            h3.form-section__title Basic Information
+            .form-row
+              .form__group
+                label.form__label(for='name') Tour name *
+                input#name.form__input(
+                  type='text' name='name' required
+                  minlength='10' maxlength='40'
+                  value=tour.name
+                )
+              .form__group
+                label.form__label(for='difficulty') Difficulty *
+                select#difficulty.form__input(name='difficulty' required)
+                  option(value='easy'      selected=tour.difficulty==='easy')      Easy
+                  option(value='medium'    selected=tour.difficulty==='medium')    Medium
+                  option(value='difficult' selected=tour.difficulty==='difficult') Difficult
+
+            .form-row
+              .form__group
+                label.form__label(for='duration') Duration (days) *
+                input#duration.form__input(type='number' name='duration' required min='1' value=tour.duration)
+              .form__group
+                label.form__label(for='maxGroupSize') Max group size *
+                input#maxGroupSize.form__input(type='number' name='maxGroupSize' required min='1' value=tour.maxGroupSize)
+
+            .form-row
+              .form__group
+                label.form__label(for='price') Price ($) *
+                input#price.form__input(type='number' name='price' required min='0' value=tour.price)
+              .form__group
+                label.form__label(for='priceDiscount') Price discount ($)
+                input#priceDiscount.form__input(type='number' name='priceDiscount' min='0' value=tour.priceDiscount || '')
+
+            h3.form-section__title Description
+            .form__group
+              label.form__label(for='summary') Summary *
+              textarea#summary.form__input(name='summary' rows='2' required)= tour.summary
+            .form__group
+              label.form__label(for='description') Full description
+              textarea#description.form__input(name='description' rows='5')= tour.description || ''
+
+            h3.form-section__title Images
+            .form-row
+              .form__group
+                label.form__label(for='imageCover') Cover image
+                if tour.imageCover
+                  .file-preview#cover-preview
+                    img.file-preview__img(src=`/img/tours/${tour.imageCover}` alt='Current cover')
+                else
+                  .file-preview#cover-preview
+                input#imageCover.form__input.form__input--file(type='file' name='imageCover' accept='image/*')
+                p.form__hint Leave blank to keep current cover
+              .form__group
+                label.form__label(for='images') Gallery images (max 3)
+                if tour.images && tour.images.length
+                  .file-preview#gallery-preview
+                    each img in tour.images
+                      img.file-preview__img(src=`/img/tours/${img}` alt='Gallery image')
+                else
+                  .file-preview#gallery-preview
+                input#images.form__input.form__input--file(type='file' name='images' accept='image/*' multiple)
+                p.form__hint Leave blank to keep current gallery
+
+            h3.form-section__title Start Dates
+            - const d1 = tour.startDates[0] ? new Date(tour.startDates[0]).toISOString().split('T')[0] : ''
+            - const d2 = tour.startDates[1] ? new Date(tour.startDates[1]).toISOString().split('T')[0] : ''
+            - const d3 = tour.startDates[2] ? new Date(tour.startDates[2]).toISOString().split('T')[0] : ''
+            .form-row
+              .form__group
+                label.form__label(for='startDate1') Date 1 *
+                input#startDate1.form__input(type='date' name='startDate1' required value=d1)
+              .form__group
+                label.form__label(for='startDate2') Date 2
+                input#startDate2.form__input(type='date' name='startDate2' value=d2)
+              .form__group
+                label.form__label(for='startDate3') Date 3
+                input#startDate3.form__input(type='date' name='startDate3' value=d3)
+
+            h3.form-section__title Start Location
+            .form-row
+              .form__group
+                label.form__label(for='startLocationDescription') City / Region *
+                input#startLocationDescription.form__input(
+                  type='text' name='startLocationDescription' required
+                  value=tour.startLocation.description
+                )
+              .form__group
+                label.form__label(for='startLocationAddress') Street address
+                input#startLocationAddress.form__input(
+                  type='text' name='startLocationAddress'
+                  value=tour.startLocation.address || ''
+                )
+            .form-row
+              .form__group
+                label.form__label(for='startLocationLat') Latitude *
+                input#startLocationLat.form__input(
+                  type='number' name='startLocationLat' required
+                  step='0.000001' value=tour.startLocation.coordinates[1]
+                )
+              .form__group
+                label.form__label(for='startLocationLng') Longitude *
+                input#startLocationLng.form__input(
+                  type='number' name='startLocationLng' required
+                  step='0.000001' value=tour.startLocation.coordinates[0]
+                )
+
+            if guides && guides.length
+              h3.form-section__title Guides
+              .form__group
+                label.form__label(for='guides') Assign guides
+                p.form__hint Hold Ctrl / Cmd to select multiple
+                - const assignedIds = (tour.guides || []).map(g => g._id ? g._id.toString() : g.toString())
+                select#guides.form__input(name='guides' multiple size=`${Math.min(guides.length, 6)}`)
+                  each guide in guides
+                    option(value=`${guide._id}` selected=assignedIds.includes(guide._id.toString())) #{guide.name} — #{guide.role}
+
+            .form__group.ma-bt-lg
+              button.btn.btn--green.btn--full(type='submit') Save Changes

@@ -23,6 +23,7 @@ router.post("/submit-user-data", authController.protect, viewController.updateUs
 // Protected — admin only
 router.get("/manage-tours",    authController.protect, authController.restrictTo("admin"), viewController.getManageTours);
 router.get("/create-tour",     authController.protect, authController.restrictTo("admin"), viewController.getCreateTourForm);
+router.get("/edit-tour/:id",   authController.protect, authController.restrictTo("admin"), viewController.getEditTourForm);
 router.get("/manage-users",    authController.protect, authController.restrictTo("admin"), viewController.getManageUsers);
 router.get("/manage-reviews",  authController.protect, authController.restrictTo("admin"), viewController.getManageReviews);
 router.get("/manage-bookings", authController.protect, authController.restrictTo("admin"), viewController.getManageBookings);
