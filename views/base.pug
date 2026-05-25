@@ -22,6 +22,19 @@ html(lang="en")
     // FOOTER
     include _footer
 
+    // Logout confirmation modal
+    #logout-modal.logout-modal(role='dialog' aria-modal='true' aria-labelledby='logout-modal-title')
+      .logout-modal__backdrop
+      .logout-modal__card
+        .logout-modal__icon
+          svg(aria-hidden='true')
+            use(xlink:href='/img/icons.svg#icon-log-out')
+        h3#logout-modal-title.logout-modal__title Sign out?
+        p.logout-modal__body You'll be signed out of your account on this device.
+        .logout-modal__actions
+          button#logout-cancel.logout-modal__btn.logout-modal__btn--cancel Cancel
+          button#logout-confirm.logout-modal__btn.logout-modal__btn--confirm Sign out
+
     //- script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
     //- script(src="/js/mapbox.js") 
     //- script(src="/js/login.js") 
