@@ -2237,8 +2237,12 @@ a  { color: inherit; text-decoration: none; }
 .header__hero-img { will-change: transform; transition: transform .05s linear; }
 
 /* --- Tour heading entrance --- */
+@keyframes headingBoxIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.82) translateY(18px); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1)   translateY(0);    }
+}
 .heading-box {
-  animation: scaleIn .9s cubic-bezier(0.22,1,0.36,1) .15s both;
+  animation: headingBoxIn .9s cubic-bezier(0.22,1,0.36,1) .15s both;
 }
 .heading-primary > span {
   display: inline-block;
