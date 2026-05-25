@@ -186,6 +186,9 @@ if (resetForm)
   });
 
 if (logOutBtn) logOutBtn.addEventListener("click", logout);
+document.querySelectorAll(".btn--logout-settings").forEach(btn =>
+  btn.addEventListener("click", logout)
+);
 
 // ── Account settings form ──────────────────────────────────────────────────────
 const userDataForm     = document.querySelector(".form-user-data");

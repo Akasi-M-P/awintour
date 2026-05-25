@@ -1155,6 +1155,8 @@ a  { color: inherit; text-decoration: none; }
   .nav__el:not(:last-child) { margin-right: 1.4rem; }
   /* Hide username text on mobile — show avatar only */
   .nav__user-img + span { display: none; }
+  /* Hide header logout on mobile — it sits too close to the profile avatar */
+  .nav__el--logout { display: none; }
 
   .auth-card { padding: 3.2rem 2rem; }
 
@@ -2064,6 +2066,27 @@ a  { color: inherit; text-decoration: none; }
   color: #fff;
 }
 .btn--red:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+
+.logout-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem 0;
+  flex-wrap: wrap;
+}
+.logout-section__text {
+  font-size: 1.4rem;
+  color: var(--clr-slate-500);
+  margin: 0;
+}
+.btn--logout-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: .8rem;
+  flex-shrink: 0;
+}
+.btn--logout-settings svg { width: 1.6rem; height: 1.6rem; }
 
 .btn--white {
   background: rgba(255,255,255,.08);

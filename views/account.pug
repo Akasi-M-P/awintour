@@ -55,3 +55,13 @@ block content
               input#password-confirm.form__input(type='password', placeholder='••••••••', required, minlength='8')
             .form__group.right
               button.btn.btn--small.btn--green.btn--save-password Save password
+
+        .line &nbsp;
+
+        .user-view__form-container
+          .logout-section
+            p.logout-section__text You will be signed out of your account on this device.
+            button.btn.btn--red.btn--logout-settings(type='button')
+              svg(aria-hidden='true')
+                use(xlink:href='/img/icons.svg#icon-log-out')
+              | Log out

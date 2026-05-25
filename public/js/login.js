@@ -24,12 +24,9 @@ export const login = async (email, password) => {
 };
 
 export const logout = async () => {
+  if (!confirm("Are you sure you want to log out?")) return;
   try {
-    const res = await axios({
-      method: "GET",
-      url: "/api/v1/users/logout",
-    });
-
+    const res = await axios({ method: "GET", url: "/api/v1/users/logout" });
     if (res.data.status === "success") location.assign("/");
   } catch (error) {
     showAlert("error", "Error logging out! Try again");
