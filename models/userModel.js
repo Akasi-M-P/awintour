@@ -70,9 +70,11 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-// THIS QUERY MIDDLEWARE POINTS TO THE CURRENT QUERY AND RETURN ONLY USERS WITH ACTIVE SET TO TRUE
+// Filter inactive users from public queries; skip for update/delete operations
 userSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
+  if (!this.options.includeInactive && !this.op.includes('Update') && !this.op.includes('Delete')) {
+    this.find({ active: { $ne: false } });
+  }
   next();
 });
 

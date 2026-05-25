@@ -14,7 +14,7 @@ block content
             p.no-results No bookings found.
           else
             .admin-table-wrap
-              table.admin-table
+              table.admin-table.admin-table--bookings
                 thead
                   tr
                     th User
@@ -26,15 +26,19 @@ block content
                 tbody
                   each booking in bookings
                     tr
-                      td= booking.user ? booking.user.name : '—'
-                      td= booking.tour ? booking.tour.name : '—'
-                      td $#{booking.price}
-                      td= new Date(booking.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-                      td
+                      td(data-label='User')= booking.user ? booking.user.name : '—'
+                      td(data-label='Tour')= booking.tour ? booking.tour.name : '—'
+                      td(data-label='Price') $#{booking.price}
+                      td(data-label='Date')= new Date(booking.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                      td(data-label='Paid')
                         span(class=`admin-badge admin-badge--${booking.paid ? 'yes' : 'no'}`)= booking.paid ? 'Paid' : 'Unpaid'
                       td.admin-table__actions
-                        button.btn.btn--small.btn--red(
+                        button.admin-icon-btn.admin-icon-btn--delete(
                           data-id=`${booking._id}`
                           data-resource='bookings'
                           data-action='delete'
-                        ) Delete
+                          title='Delete booking'
+                          aria-label='Delete booking'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href='/img/icons.svg#icon-trash-2')

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 process.on("uncaughtException", (err) => {
   console.log("UNCAUGHT EXCEPTION! Shutting down...");
@@ -17,8 +19,7 @@ const DB = process.env.DATABASE.replace(
 );
 
 mongoose
-  .connect(DB)
-  // .then((con) => console.log(con.connections))
+  .connect(DB, { family: 4 })
   .then(() => console.log("DB Connected Successfully"))
   .catch((err) => console.log(err));
 

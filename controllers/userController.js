@@ -73,7 +73,7 @@ exports.getMe = (req, res, next) => {
 // THIS ROUTE ALLOWS A LOGGED USER TO UPDATE THEIR DATA AND NOT PASSWORD
 exports.updateMe = catchAsync(async (req, res, next) => {
   // CREATE ERROR IF USER TRIES TO UPDATE PASSWORD DATA
-  if (req.body.password || req.body.passswordConfirm) {
+  if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
         "This route is not for password updates. Please use /updateMyPassword",

@@ -15,7 +15,7 @@ block content
             p.no-results No tours found.
           else
             .admin-table-wrap
-              table.admin-table
+              table.admin-table.admin-table--tours
                 thead
                   tr
                     th Image
@@ -26,18 +26,33 @@ block content
                     th Actions
                 tbody
                   each tour in tours
-                    tr
-                      td
+                    tr(class=tour.secretTour ? 'admin-row--hidden' : '')
+                      td(data-label='Image')
                         img.admin-table__img(src=`/img/tours/${tour.imageCover}` alt=tour.name)
-                      td= tour.name
-                      td $#{tour.price}
-                      td
+                      td(data-label='Name')
+                        a.admin-table__name-link(href=`/tour/${tour.slug}`)= tour.name
+                      td(data-label='Price') $#{tour.price}
+                      td(data-label='Difficulty')
                         span(class=`card__badge card__badge--${tour.difficulty}`)= tour.difficulty
-                      td= tour.ratingsAverage
+                      td(data-label='Rating')= tour.ratingsAverage
                       td.admin-table__actions
-                        a.btn.btn--small.btn--green(href=`/tour/${tour.slug}`) View
-                        button.btn.btn--small.btn--red(
+                        button.admin-icon-btn.admin-icon-btn--toggle(
+                          data-id=`${tour._id}`
+                          data-resource='tours'
+                          data-action='toggle'
+                          data-field='secretTour'
+                          data-value=`${tour.secretTour}`
+                          title=tour.secretTour ? 'Unhide tour' : 'Hide tour'
+                          aria-label=tour.secretTour ? 'Unhide tour' : 'Hide tour'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href=`/img/icons.svg#icon-eye${tour.secretTour ? '-off' : ''}`)
+                        button.admin-icon-btn.admin-icon-btn--delete(
                           data-id=`${tour._id}`
                           data-resource='tours'
                           data-action='delete'
-                        ) Delete
+                          title='Delete tour'
+                          aria-label='Delete tour'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href='/img/icons.svg#icon-trash-2')

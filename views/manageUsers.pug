@@ -14,29 +14,42 @@ block content
             p.no-results No users found.
           else
             .admin-table-wrap
-              table.admin-table
+              table.admin-table.admin-table--users
                 thead
                   tr
                     th Photo
                     th Name
                     th Email
-                    th Role
-                    th Active
+                    th Role / Status
                     th Actions
                 tbody
                   each u in users
-                    tr
-                      td
+                    tr(class=u.active === false ? 'admin-row--hidden' : '')
+                      td(data-label='Photo')
                         img.admin-table__img.admin-table__img--round(src=`/img/users/${u.photo}` alt=u.name)
-                      td= u.name
-                      td= u.email
-                      td
+                      td(data-label='Name')= u.name
+                      td(data-label='Email')= u.email
+                      td(data-label='Role')
                         span(class=`admin-badge admin-badge--${u.role}`)= u.role
-                      td
                         span(class=`admin-badge admin-badge--${u.active !== false ? 'yes' : 'no'}`)= u.active !== false ? 'Active' : 'Inactive'
                       td.admin-table__actions
-                        button.btn.btn--small.btn--red(
+                        button.admin-icon-btn.admin-icon-btn--toggle(
+                          data-id=`${u._id}`
+                          data-resource='users'
+                          data-action='toggle'
+                          data-field='active'
+                          data-value=`${u.active !== false}`
+                          title=u.active !== false ? 'Deactivate user' : 'Activate user'
+                          aria-label=u.active !== false ? 'Deactivate user' : 'Activate user'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href=`/img/icons.svg#icon-eye${u.active === false ? '-off' : ''}`)
+                        button.admin-icon-btn.admin-icon-btn--delete(
                           data-id=`${u._id}`
                           data-resource='users'
                           data-action='delete'
-                        ) Delete
+                          title='Delete user'
+                          aria-label='Delete user'
+                        )
+                          svg(aria-hidden='true')
+                            use(xlink:href='/img/icons.svg#icon-trash-2')

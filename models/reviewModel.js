@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const Tour = require("./tourModel");
-const { findByIdAndDelete } = require("./userModel");
 
 const reviewSchema = new mongoose.Schema(
   {

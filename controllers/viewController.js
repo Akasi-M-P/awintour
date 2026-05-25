@@ -103,7 +103,7 @@ exports.getWishlist = catchAsync(async (req, res) => {
 });
 
 exports.getManageTours = catchAsync(async (req, res) => {
-  const tours = await Tour.find().select("name price difficulty ratingsAverage duration imageCover");
+  const tours = await Tour.find().setOptions({ includeSecret: true }).select("name slug price difficulty ratingsAverage imageCover secretTour");
   res.status(200).render("manageTours", { title: "Manage Tours", tours });
 });
 
@@ -113,7 +113,7 @@ exports.getCreateTourForm = catchAsync(async (req, res) => {
 });
 
 exports.getManageUsers = catchAsync(async (req, res) => {
-  const users = await User.find().select("name email role photo active");
+  const users = await User.find().setOptions({ includeInactive: true }).select("name email role photo active");
   res.status(200).render("manageUsers", { title: "Manage Users", users });
 });
 

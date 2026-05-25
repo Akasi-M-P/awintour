@@ -1020,6 +1020,8 @@ a  { color: inherit; text-decoration: none; }
 @media (max-width: 62.5em) {
   .heading-primary { font-size: 3.6rem; }
 
+  .main { padding: 5rem 3rem; }
+
   /* Tour hero */
   .section-header { height: 50vw; }
 
@@ -1031,13 +1033,14 @@ a  { color: inherit; text-decoration: none; }
   }
 
   /* Account sidebar → horizontal top nav */
-  .user-view { flex-direction: column; }
-  .user-view__menu { flex: 0 0 auto; padding: 1.6rem 0 0; }
-  .user-view__content { padding: 3rem 0; }
-  .admin-table { min-width: 62rem; font-size: 1.4rem; }
+  .user-view { flex-direction: column; overflow: visible; }
+  .user-view__menu { flex: 0 0 auto; width: 100%; padding: 1.6rem 0 0; }
+  .user-view__content { flex: 1 1 auto; width: 100%; min-width: 0; padding: 3rem 0; }
+  .admin-table { min-width: 60rem; font-size: 1.4rem; }
   .admin-table td { padding: 1.2rem 1.4rem; font-size: 1.35rem; }
-  .side-nav { display: flex; flex-wrap: wrap; padding: 0 1.6rem; }
-  .side-nav li { margin: 0; }
+  .side-nav { display: flex; flex-wrap: nowrap; overflow-x: auto; padding: .4rem 1.6rem; scrollbar-width: none; }
+  .side-nav::-webkit-scrollbar { display: none; }
+  .side-nav li { margin: 0; flex-shrink: 0; }
   .side-nav a:link,
   .side-nav a:visited {
     padding: .8rem 1.8rem;
@@ -1170,15 +1173,225 @@ a  { color: inherit; text-decoration: none; }
   .user-view__form-container { padding: 0 1.6rem; }
   .user-view__form-container--wide { padding: 0 .8rem; }
   .user-view__content { padding: 2.4rem 0; }
+  /* Tab-bar nav: icon above short label */
   .side-nav a:link,
-  .side-nav a:visited { padding: .6rem 1rem; font-size: 1.2rem; gap: .6rem; }
-  .side-nav svg { height: 1.6rem; width: 1.6rem; }
+  .side-nav a:visited {
+    flex-direction: column;
+    align-items: center;
+    padding: .6rem .9rem;
+    gap: 3px;
+  }
+  .side-nav__label { display: none; }
+  .side-nav a::after {
+    content: attr(data-short);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: inherit;
+  }
+  .side-nav svg { height: 1.8rem; width: 1.8rem; }
+  .admin-nav__heading { font-size: .85rem; padding: .3rem 1.6rem .1rem; margin: 0; }
 
-  /* Admin tables */
-  .admin-table { min-width: 56rem; font-size: 1.35rem; }
-  .admin-table th { padding: 1rem 1.2rem; font-size: 1.1rem; }
-  .admin-table td { padding: 1.1rem 1.2rem; font-size: 1.3rem; }
-  .user-view__content { padding: 2.4rem 0; }
+  /* ── ADMIN TABLES → CARDS ON MOBILE ──
+     Use px throughout — html is 56.25% (9px) here so rem would be tiny */
+  .admin-table-wrap {
+    border: none; border-radius: 0;
+    box-shadow: none; overflow-x: visible; background: transparent;
+  }
+  .admin-table, .admin-table tbody { display: block; min-width: 0 !important; width: 100%; max-width: 100%; }
+  .admin-table thead { display: none; }
+
+  /* Card shell */
+  .admin-table tr {
+    display: block;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  }
+
+  /* Base cell reset */
+  .admin-table td {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--clr-border);
+    border-right: none;
+    font-size: 14px;
+    color: var(--clr-text);
+    position: static;
+    box-shadow: none;
+    background: transparent !important;
+    min-width: 0;
+  }
+  /* Fix specificity: base rule .admin-table tr:last-child td removes borders — restore them */
+  .admin-table tr:last-child td { border-bottom: 1px solid var(--clr-border); }
+  .admin-table tr td:last-child { border-bottom: none !important; }
+
+  /* Unstick last column */
+  .admin-table th:last-child,
+  .admin-table td:last-child { position: static; box-shadow: none; background: transparent !important; }
+
+  /* Generic label via ::before */
+  .admin-table td[data-label]::before {
+    content: attr(data-label);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--clr-slate-400);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    flex-shrink: 0;
+    width: 68px;
+    min-width: 68px;
+  }
+
+  /* Touch targets */
+  .admin-icon-btn { width: 40px; height: 40px; }
+  .admin-icon-btn svg { width: 18px; height: 18px; }
+
+  /* ── USERS CARD ── */
+  /* Dark gradient avatar header */
+  .admin-table--users td[data-label='Photo'] {
+    justify-content: center;
+    padding: 28px 16px 22px;
+    background: linear-gradient(135deg, #0f172a 0%, #1c0a00 100%) !important;
+    border-bottom: 3px solid rgba(249,115,22,.3) !important;
+  }
+  .admin-table--users td[data-label='Photo']::before { display: none; }
+  .admin-table--users td[data-label='Photo'] .admin-table__img--round {
+    width: 72px; height: 72px;
+    border: 3px solid rgba(249,115,22,.55);
+    box-shadow: 0 0 0 5px rgba(249,115,22,.12);
+  }
+  /* Name as card title */
+  .admin-table--users td[data-label='Name'] {
+    padding: 14px 16px 3px;
+    font-size: 16px; font-weight: 700;
+    border-bottom: none;
+    justify-content: flex-start;
+  }
+  .admin-table--users td[data-label='Name']::before { display: none; }
+  /* Email as subtitle */
+  .admin-table--users td[data-label='Email'] {
+    padding: 3px 16px 12px;
+    font-size: 13px; color: var(--clr-slate-500);
+    border-bottom: 1px solid var(--clr-border);
+    justify-content: flex-start;
+  }
+  .admin-table--users td[data-label='Email']::before { display: none; }
+  /* Role/status badges row */
+  .admin-table--users td[data-label='Role'] {
+    padding: 12px 16px;
+    gap: 8px; flex-wrap: wrap;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--clr-border);
+  }
+  .admin-table--users td[data-label='Role']::before { display: none; }
+  /* Actions footer */
+  .admin-table--users td.admin-table__actions {
+    justify-content: flex-end;
+    padding: 12px 16px;
+    background: var(--clr-slate-50) !important;
+  }
+  .admin-table--users td.admin-table__actions::before { display: none; }
+
+  /* ── TOURS CARD ── */
+  /* Full-bleed image banner */
+  .admin-table--tours td[data-label='Image'] {
+    padding: 0;
+    border-bottom: none !important;
+    background: var(--clr-slate-200) !important;
+  }
+  .admin-table--tours td[data-label='Image']::before { display: none; }
+  .admin-table--tours td[data-label='Image'] .admin-table__img {
+    width: 100%; height: 160px;
+    border-radius: 0; object-fit: cover; display: block;
+  }
+  /* Tour name as card title below image */
+  .admin-table--tours td[data-label='Name'] {
+    padding: 14px 16px 10px;
+    font-size: 16px; font-weight: 700;
+    border-bottom: 1px solid var(--clr-border);
+    justify-content: flex-start;
+  }
+  .admin-table--tours td[data-label='Name']::before { display: none; }
+  /* Data rows */
+  .admin-table--tours td[data-label='Price'],
+  .admin-table--tours td[data-label='Difficulty'],
+  .admin-table--tours td[data-label='Rating'] { justify-content: flex-start; gap: 12px; }
+  /* Actions */
+  .admin-table--tours td.admin-table__actions {
+    justify-content: flex-end;
+    padding: 12px 16px; gap: 10px;
+    background: var(--clr-slate-50) !important;
+  }
+  .admin-table--tours td.admin-table__actions::before { display: none; }
+
+  /* ── BOOKINGS CARD ── */
+  /* User name as card title */
+  .admin-table--bookings td[data-label='User'] {
+    padding: 14px 16px 3px;
+    font-size: 16px; font-weight: 700;
+    border-bottom: none;
+    justify-content: flex-start;
+  }
+  .admin-table--bookings td[data-label='User']::before { display: none; }
+  /* Tour as subtitle */
+  .admin-table--bookings td[data-label='Tour'] {
+    padding: 3px 16px 12px;
+    font-size: 13px; color: var(--clr-slate-500);
+    border-bottom: 1px solid var(--clr-border);
+    justify-content: flex-start;
+  }
+  .admin-table--bookings td[data-label='Tour']::before { display: none; }
+  /* Data rows */
+  .admin-table--bookings td[data-label='Price'],
+  .admin-table--bookings td[data-label='Date'],
+  .admin-table--bookings td[data-label='Paid'] { justify-content: flex-start; gap: 12px; }
+  /* Actions */
+  .admin-table--bookings td.admin-table__actions {
+    justify-content: flex-end;
+    padding: 12px 16px;
+    background: var(--clr-slate-50) !important;
+  }
+  .admin-table--bookings td.admin-table__actions::before { display: none; }
+
+  /* ── REVIEWS CARD ── */
+  /* Reviewer header */
+  .admin-table--reviews td[data-label='User'] {
+    padding: 14px 16px;
+    background: var(--clr-slate-50) !important;
+    border-bottom: 1px solid var(--clr-border);
+    justify-content: flex-start;
+  }
+  .admin-table--reviews td[data-label='User']::before { display: none; }
+  .admin-table--reviews td[data-label='User'] .admin-user-cell { gap: 12px; }
+  .admin-table--reviews td[data-label='User'] .admin-table__img--round { width: 40px; height: 40px; }
+  .admin-table--reviews td[data-label='User'] span { font-size: 15px; font-weight: 600; }
+  /* Data rows */
+  .admin-table--reviews td[data-label='Tour'],
+  .admin-table--reviews td[data-label='Rating'] { justify-content: flex-start; gap: 12px; }
+  /* Review text — wrap */
+  .admin-table--reviews td.admin-table__review {
+    white-space: normal; max-width: none;
+    overflow: visible; text-overflow: unset;
+    align-items: flex-start;
+    font-size: 13px; color: var(--clr-slate-500);
+    line-height: 1.55;
+    justify-content: flex-start; gap: 12px;
+  }
+  .admin-table--reviews td.admin-table__review::before { margin-top: 1px; flex-shrink: 0; }
+  /* Actions */
+  .admin-table--reviews td.admin-table__actions {
+    justify-content: flex-end;
+    padding: 12px 16px;
+    background: var(--clr-slate-50) !important;
+  }
+  .admin-table--reviews td.admin-table__actions::before { display: none; }
 
   /* Filter bar */
   .filter-bar { padding: 1.2rem 1.4rem; gap: .8rem; }
@@ -1502,6 +1715,77 @@ a  { color: inherit; text-decoration: none; }
 }
 
 .admin-user-cell { display: flex; align-items: center; gap: 1rem; }
+
+/* Icon action buttons */
+.admin-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+}
+.admin-icon-btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.admin-icon-btn--view {
+  background: rgba(59,130,246,.1);
+  color: #2563eb;
+}
+.admin-icon-btn--view:hover {
+  background: #2563eb;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37,99,235,.35);
+}
+.admin-icon-btn--delete {
+  background: rgba(239,68,68,.1);
+  color: #dc2626;
+}
+.admin-icon-btn--delete:hover {
+  background: #dc2626;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220,38,38,.35);
+}
+.admin-icon-btn--toggle {
+  background: rgba(16,185,129,.1);
+  color: #059669;
+}
+.admin-icon-btn--toggle:hover {
+  background: #059669;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5,150,105,.35);
+}
+
+/* Dimmed row when tour/user is hidden */
+.admin-row--hidden { opacity: .45; }
+.admin-row--hidden .admin-icon-btn--toggle {
+  background: rgba(100,116,139,.12);
+  color: #64748b;
+}
+.admin-row--hidden .admin-icon-btn--toggle:hover {
+  background: #059669;
+  color: #fff;
+  opacity: 1;
+}
+
+/* Clickable tour name link in table */
+.admin-table__name-link {
+  color: var(--clr-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.admin-table__name-link:hover { color: var(--clr-primary-500); text-decoration: underline; }
 
 /* Role / status badges */
 .admin-badge {

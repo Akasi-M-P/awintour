@@ -158,8 +158,10 @@ tourSchema.pre("save", function (next) {
 
 // MONGOOSE QUERY MIDDLEWARE: ALLOWS DATA TO BE MANIPULATED BEFORE AND AFTER A QUERY IS MADE. E.G(FIND(),FINDONE(),FINDONEANDUPDATE()...ETC)"
 tourSchema.pre(/^find/, function (next) {
-  this.find({ secretTour: { $ne: true } });
-  // CALCULATE HOW LONG IT TAKES TO RECEIVE A RESPONSE FROM A QUERY
+  // Only filter secret tours for read queries, not updates/deletes
+  if (!this.options.includeSecret && !this.op.includes('Update') && !this.op.includes('Delete')) {
+    this.find({ secretTour: { $ne: true } });
+  }
   this.start = Date.now();
   next();
 });
